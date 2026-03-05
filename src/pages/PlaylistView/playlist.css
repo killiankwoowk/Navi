@@ -1,0 +1,26 @@
+.playlist-viewport {
+  border: 1px solid rgba(0, 255, 156, 0.2);
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.playlist-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: rgba(0, 255, 156, 0.08);
+  border: 1px solid rgba(0, 255, 156, 0.24);
+}
+
+.playlist-cover.is-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent, rgba(0, 229, 255, 0.2), transparent);
+  animation: playlist-cover-shimmer 1.2s linear infinite;
+}
+
+@keyframes playlist-cover-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

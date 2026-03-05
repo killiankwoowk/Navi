@@ -4,10 +4,11 @@ import { CreatePlaylistModal } from '@/components/playlists/CreatePlaylistModal'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingRows } from '@/components/common/LoadingRows'
 import { TerminalPanel } from '@/components/common/TerminalPanel'
+import { PlaylistView } from '@/pages/PlaylistView/PlaylistView'
 import { useCreatePlaylist, usePlaylistDetailQuery, usePlaylistsQuery, useRemoveSongFromPlaylist } from '@/features/playlists/usePlaylists'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { usePlayerStore } from '@/store/playerStore'
-import { formatDuration } from '@/utils/format'
+import { useUiStore } from '@/store/uiStore'
 
 export const PlaylistsPage = () => {
   useDocumentTitle('Playlists | Navi Terminal Player')
@@ -17,6 +18,7 @@ export const PlaylistsPage = () => {
 
   const setQueue = usePlayerStore((state) => state.setQueue)
   const addToQueue = usePlayerStore((state) => state.addToQueue)
+  const openLyricsPanel = useUiStore((state) => state.openLyricsPanel)
 
   const playlistsQuery = usePlaylistsQuery()
   const selectedPlaylistId = selectedId || playlistsQuery.data?.[0]?.id || ''
@@ -61,32 +63,22 @@ export const PlaylistsPage = () => {
           <section className="space-y-1">
             {playlistDetailQuery.isLoading ? <LoadingRows rows={6} /> : null}
             {!playlistDetailQuery.isLoading && !playlistDetailQuery.data ? <EmptyState title="Select a playlist." /> : null}
-            {tracks.map((track, index) => (
-              <div key={track.id} className="grid grid-cols-[26px_1fr_auto] items-center gap-2 border border-terminal-text/20 px-2 py-1">
-                <span className="text-[11px] text-terminal-muted">{index + 1}</span>
-                <button className="truncate text-left text-sm" type="button" onClick={() => setQueue(tracks, index, true)}>
-                  {track.title}
-                </button>
-                <div className="flex items-center gap-1 text-[11px]">
-                  <span className="text-terminal-muted">{formatDuration(track.duration ?? 0)}</span>
-                  <button className="terminal-button px-1 py-0" type="button" onClick={() => addToQueue([track])}>
-                    +q
-                  </button>
-                  <button
-                    className="terminal-button px-1 py-0"
-                    type="button"
-                    onClick={() =>
-                      removeSongMutation.mutate({
-                        playlistId: selectedPlaylistId,
-                        songIndex: index,
-                      })
-                    }
-                  >
-                    rm
-                  </button>
-                </div>
-              </div>
-            ))}
+            {playlistDetailQuery.data ? (
+              <PlaylistView
+                title={playlistDetailQuery.data.name}
+                tracks={tracks}
+                isLoading={playlistDetailQuery.isLoading}
+                onPlayTrack={(_, index) => setQueue(tracks, index, true)}
+                onQueueTrack={(track) => addToQueue([track])}
+                onOpenLyrics={(track) => openLyricsPanel(track)}
+                onRemoveTrack={(_, index) =>
+                  removeSongMutation.mutate({
+                    playlistId: selectedPlaylistId,
+                    songIndex: index,
+                  })
+                }
+              />
+            ) : null}
           </section>
         </div>
       </TerminalPanel>

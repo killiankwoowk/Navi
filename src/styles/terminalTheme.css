@@ -1,0 +1,66 @@
+.ascii-frame {
+  position: relative;
+  border: 1px solid rgba(0, 255, 156, 0.35);
+  background: linear-gradient(180deg, rgba(9, 16, 13, 0.8), rgba(5, 8, 7, 0.72));
+}
+
+.ascii-frame::before,
+.ascii-frame::after {
+  position: absolute;
+  top: -8px;
+  font-size: 10px;
+  color: rgba(0, 229, 255, 0.85);
+  letter-spacing: 0.1em;
+}
+
+.ascii-frame::before {
+  content: '+-----';
+  left: 8px;
+}
+
+.ascii-frame::after {
+  content: '-----+';
+  right: 8px;
+}
+
+.terminal-card {
+  border: 1px solid rgba(0, 255, 156, 0.25);
+  background: rgba(0, 0, 0, 0.34);
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+
+.terminal-card:hover {
+  border-color: rgba(0, 229, 255, 0.75);
+  transform: translateY(-1px);
+}
+
+.terminal-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 255, 156, 0.06);
+}
+
+.terminal-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.15), transparent);
+  animation: skeleton-shimmer 1.4s linear infinite;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.terminal-carousel {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 229, 255, 0.35) transparent;
+}
+
+.lyrics-line-active {
+  color: #00e5ff;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+}

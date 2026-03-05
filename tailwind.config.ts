@@ -35,6 +35,10 @@ export default {
       boxShadow: {
         terminal: '0 0 0 1px rgba(0,255,156,0.35), inset 0 0 0 1px rgba(0,255,156,0.1)',
       },
+      backgroundImage: {
+        'terminal-scanline':
+          'repeating-linear-gradient(to bottom, rgba(0,255,156,0.03), rgba(0,255,156,0.03) 1px, transparent 1px, transparent 3px)',
+      },
       transitionDuration: {
         fast: '140ms',
       },

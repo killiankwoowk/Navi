@@ -6,12 +6,15 @@ import { AppShell } from '@/components/layout/AppShell'
 import { useAuthStore } from '@/store/authStore'
 
 const LoginPage = lazy(() => import('@/pages/LoginPage').then((module) => ({ default: module.LoginPage })))
-const LibraryPage = lazy(() => import('@/pages/LibraryPage').then((module) => ({ default: module.LibraryPage })))
+const HomeDashboard = lazy(() => import('@/pages/HomeDashboard').then((module) => ({ default: module.HomeDashboard })))
 const ArtistsPage = lazy(() => import('@/pages/ArtistsPage').then((module) => ({ default: module.ArtistsPage })))
 const ArtistDetailPage = lazy(() => import('@/pages/ArtistDetailPage').then((module) => ({ default: module.ArtistDetailPage })))
 const AlbumDetailPage = lazy(() => import('@/pages/AlbumDetailPage').then((module) => ({ default: module.AlbumDetailPage })))
 const SearchPage = lazy(() => import('@/pages/SearchPage').then((module) => ({ default: module.SearchPage })))
 const PlaylistsPage = lazy(() => import('@/pages/PlaylistsPage').then((module) => ({ default: module.PlaylistsPage })))
+const FavoritesPage = lazy(() => import('@/pages/Favorites').then((module) => ({ default: module.Favorites })))
+const MostPlayedPage = lazy(() => import('@/pages/MostPlayed').then((module) => ({ default: module.MostPlayed })))
+const RecentlyPlayedPage = lazy(() => import('@/pages/RecentlyPlayed').then((module) => ({ default: module.RecentlyPlayed })))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
 
 const PageLoader = () => (
@@ -63,7 +66,19 @@ export const router = createBrowserRouter([
       },
       {
         path: '/library',
-        element: <LibraryPage />,
+        element: <HomeDashboard />,
+      },
+      {
+        path: '/favorites',
+        element: <FavoritesPage />,
+      },
+      {
+        path: '/most-played',
+        element: <MostPlayedPage />,
+      },
+      {
+        path: '/recently-played',
+        element: <RecentlyPlayedPage />,
       },
       {
         path: '/artists',

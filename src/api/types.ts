@@ -53,6 +53,11 @@ export interface Song {
   coverArt?: string
   suffix?: string
   bitrate?: number
+  starred?: string
+  playCount?: number
+  lyrics?: string
+  syncedLyrics?: string
+  unsyncedLyrics?: string
 }
 
 export interface Album {
@@ -86,6 +91,19 @@ export interface Search3Result {
 }
 
 export type RepeatMode = 'off' | 'all' | 'one'
+export type AudioQuality = 'auto' | 'low' | 'medium' | 'high'
+export type LyricsSource = 'auto' | 'genius' | 'local'
+
+export interface LyricsEntry {
+  time: number
+  text: string
+}
+
+export interface LyricsPayload {
+  plain: string | null
+  synced: string | null
+  provider: 'server' | 'genius' | 'local' | 'none'
+}
 
 export interface QueueItem {
   queueId: string
@@ -108,6 +126,12 @@ export interface PlayerState {
   duration: number
   shuffleOrder: number[]
   sleepTimer: SleepTimerState
+}
+
+export interface UsageEntry {
+  song: Song
+  playCount: number
+  lastPlayedAt: number
 }
 
 export interface SubsonicApiError {
@@ -138,11 +162,17 @@ export interface NavidromeClient {
   getAlbumList: (type?: string, size?: number, offset?: number) => Promise<Album[]>
   getSong: (id: string) => Promise<Song>
   search3: (query: string, artistCount?: number, albumCount?: number, songCount?: number) => Promise<Search3Result>
+  getStarred: () => Promise<Song[]>
+  getMostPlayed: (limit?: number) => Promise<Song[]>
+  getRecentSongs: (limit?: number) => Promise<Song[]>
+  getLyrics: (artist?: string, title?: string, songId?: string) => Promise<LyricsPayload | null>
   getPlaylists: () => Promise<Playlist[]>
   getPlaylist: (id: string) => Promise<Playlist>
   createPlaylist: (name: string, songIds?: string[]) => Promise<Playlist>
   updatePlaylist: (input: UpdatePlaylistInput) => Promise<void>
+  streamViewUrl: (songId: string, opts?: StreamOptions) => string
   getStreamUrl: (songId: string, opts?: StreamOptions) => string
+  getCoverArt: (coverArtId: string, size?: number) => string
   getCoverArtUrl: (coverArtId: string, size?: number) => string
 }
 

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { createNavidromeClient } from '@/api/subsonic'
+import { createNavidromeClient } from '@/api/navidrome'
 import type { NavidromeClient, SubsonicCredentials } from '@/api/types'
 import { setAuthFailureHandler } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'

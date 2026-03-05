@@ -1,7 +1,10 @@
 import { NavLink } from 'react-router-dom'
 
 const links = [
-  { to: '/library', label: '> Library' },
+  { to: '/library', label: '> Home' },
+  { to: '/favorites', label: '> Favorites' },
+  { to: '/most-played', label: '> Most Played' },
+  { to: '/recently-played', label: '> Recently Played' },
   { to: '/artists', label: '> Artists' },
   { to: '/search', label: '> Search' },
   { to: '/playlists', label: '> Playlists' },

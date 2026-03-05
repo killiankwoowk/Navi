@@ -4,6 +4,7 @@ import '@fontsource/fira-code/400.css'
 import '@fontsource/fira-code/700.css'
 import '@/styles/globals.css'
 import '@/styles/terminal.css'
+import '@/styles/terminalTheme.css'
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 
@@ -53,4 +53,5 @@ export const useAlbumListQuery = (type = 'alphabeticalByName', size = 60, offset
       return client.getAlbumList(type, size, offset)
     },
     staleTime: 5 * 60_000,
+    placeholderData: keepPreviousData,
   })

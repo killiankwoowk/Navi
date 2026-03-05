@@ -1,15 +1,21 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
+import { MessageSquareText } from 'lucide-react'
 
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { audioEngine } from '@/player/audioEngine'
 import { getCurrentQueueItem } from '@/player/playback'
 import { usePlayerStore } from '@/store/playerStore'
+import { useSettingsStore } from '@/store/settingsStore'
 import { useUiStore } from '@/store/uiStore'
+import { useUsageStore } from '@/store/usageStore'
 import { getSongCoverArtId } from '@/utils/image'
+import { getMaxBitRateForQuality } from '@/utils/stream'
 
+import { LyricsPanel } from '@/components/Lyrics/LyricsPanel'
 import { QueuePanel } from '@/components/player/QueuePanel'
 import { NowPlaying } from '@/components/player/NowPlaying'
 import { ProgressBar } from '@/components/player/ProgressBar'
+import { QualityControl } from '@/components/player/QualityControl'
 import { TransportControls } from '@/components/player/TransportControls'
 import { VolumeControl } from '@/components/player/VolumeControl'
 import { SleepTimerControl } from '@/components/sleep/SleepTimerControl'
@@ -40,17 +46,28 @@ export const BottomPlayer = () => {
   const setSleepTimer = usePlayerStore((state) => state.setSleepTimer)
   const clearSleepTimer = usePlayerStore((state) => state.clearSleepTimer)
   const checkSleepTimer = usePlayerStore((state) => state.checkSleepTimer)
+  const incrementPlay = useUsageStore((state) => state.incrementPlay)
+  const audioQuality = useSettingsStore((state) => state.audioQuality)
+  const setAudioQuality = useSettingsStore((state) => state.setAudioQuality)
 
   const queuePanelOpen = useUiStore((state) => state.queuePanelOpen)
   const setQueuePanelOpen = useUiStore((state) => state.setQueuePanelOpen)
+  const lyricsPanelOpen = useUiStore((state) => state.lyricsPanelOpen)
+  const lyricsTargetSong = useUiStore((state) => state.lyricsTargetSong)
+  const openLyricsPanel = useUiStore((state) => state.openLyricsPanel)
+  const closeLyricsPanel = useUiStore((state) => state.closeLyricsPanel)
 
   const currentItem = useMemo(() => getCurrentQueueItem(queue, currentIndex), [currentIndex, queue])
   const client = useMemo(() => getNavidromeClientOrNull(), [])
+  const maxBitRate = useMemo(() => getMaxBitRateForQuality(audioQuality), [audioQuality])
+  const lastTrackedSongIdRef = useRef<string | null>(null)
+  const warnedBitrateProbeRef = useRef<Set<string>>(new Set())
+  const lyricsSong = lyricsTargetSong ?? currentItem?.track ?? null
 
   const coverUrl = useMemo(() => {
     const coverArtId = getSongCoverArtId(currentItem?.track)
     if (!coverArtId || !client) return undefined
-    return client.getCoverArtUrl(coverArtId, 120)
+    return client.getCoverArt(coverArtId, 120)
   }, [client, currentItem])
 
   useEffect(() => {
@@ -62,8 +79,44 @@ export const BottomPlayer = () => {
       audioEngine.pause()
       return
     }
-    audioEngine.load(client.getStreamUrl(currentItem.track.id))
-  }, [client, currentItem])
+    audioEngine.load(client.streamViewUrl(currentItem.track.id, { maxBitRate }))
+  }, [client, currentItem, maxBitRate])
+
+  useEffect(() => {
+    if (!currentItem || !isPlaying) return
+    if (lastTrackedSongIdRef.current === currentItem.track.id) return
+    incrementPlay(currentItem.track)
+    lastTrackedSongIdRef.current = currentItem.track.id
+  }, [currentItem, incrementPlay, isPlaying])
+
+  useEffect(() => {
+    if (!currentItem || !client || !maxBitRate) return
+    if (!currentItem.track.bitrate || !currentItem.track.duration) return
+    if (currentItem.track.bitrate <= maxBitRate + 16) return
+
+    const probeKey = `${currentItem.track.id}-${maxBitRate}`
+    if (warnedBitrateProbeRef.current.has(probeKey)) return
+
+    const streamUrl = client.streamViewUrl(currentItem.track.id, { maxBitRate })
+    fetch(streamUrl, { method: 'HEAD' })
+      .then((response) => {
+        const contentLength = Number(response.headers.get('content-length') ?? '0')
+        if (!contentLength) return
+        const expectedSourceBytes = (currentItem.track.bitrate! * 1000 * currentItem.track.duration!) / 8
+        const closeToSource = Math.abs(contentLength - expectedSourceBytes) / expectedSourceBytes < 0.12
+        if (closeToSource) {
+          console.warn(
+            `[Navi] maxBitRate=${maxBitRate} requested for ${currentItem.track.title}, but stream size suggests original bitrate.`,
+          )
+        }
+      })
+      .catch(() => {
+        // Probe is best-effort only.
+      })
+      .finally(() => {
+        warnedBitrateProbeRef.current.add(probeKey)
+      })
+  }, [client, currentItem, maxBitRate])
 
   useEffect(() => {
     if (!currentItem) return
@@ -119,7 +172,19 @@ export const BottomPlayer = () => {
                 onToggleShuffle={toggleShuffle}
                 onCycleRepeat={cycleRepeat}
               />
-              <VolumeControl volume={volume} onChange={setVolume} />
+              <div className="flex items-center gap-2">
+                <QualityControl value={audioQuality} onChange={setAudioQuality} compact />
+                <button
+                  className={`terminal-button px-2 py-1 ${lyricsPanelOpen ? 'border-terminal-accent text-terminal-accent' : ''}`}
+                  type="button"
+                  onClick={() => (lyricsPanelOpen ? closeLyricsPanel() : openLyricsPanel(currentItem?.track ?? null))}
+                  aria-label="Toggle lyrics panel"
+                >
+                  <MessageSquareText size={14} />
+                  lyrics
+                </button>
+                <VolumeControl volume={volume} onChange={setVolume} />
+              </div>
             </div>
             <ProgressBar
               progress={progress}
@@ -137,6 +202,7 @@ export const BottomPlayer = () => {
               onSetTimer={setSleepTimer}
               onCancel={clearSleepTimer}
             />
+            <QualityControl value={audioQuality} onChange={setAudioQuality} />
             <div className="text-xs text-terminal-muted">
               [{currentIndex + 1}/{queue.length || 0}] {currentItem?.track.album ?? '--'}
             </div>
@@ -153,6 +219,13 @@ export const BottomPlayer = () => {
           onClose={() => setQueuePanelOpen(false)}
         />
       ) : null}
+      <LyricsPanel
+        open={lyricsPanelOpen}
+        song={lyricsSong}
+        currentTimeSec={progress}
+        isPlaying={isPlaying}
+        onClose={closeLyricsPanel}
+      />
     </>
   )
 }
