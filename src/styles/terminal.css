@@ -1,0 +1,55 @@
+.terminal-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.terminal-grid::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 255, 156, 0.025),
+    rgba(0, 255, 156, 0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: -2;
+}
+
+.terminal-grid::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, rgba(0, 229, 255, 0.07), rgba(0, 229, 255, 0));
+  animation: scanline 9s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.terminal-panel {
+  @apply rounded-none border border-terminal-text/30 bg-terminal-panel/70 shadow-terminal backdrop-blur-[1px];
+}
+
+.terminal-heading {
+  @apply border-b border-terminal-text/25 px-3 py-2 text-xs uppercase tracking-[0.2em] text-terminal-muted;
+}
+
+.terminal-button {
+  @apply inline-flex items-center gap-2 border border-terminal-text/45 bg-transparent px-2 py-1 text-xs uppercase tracking-[0.15em] text-terminal-text transition-colors duration-fast hover:border-terminal-accent hover:text-terminal-accent disabled:cursor-not-allowed disabled:opacity-40;
+}
+
+.terminal-input {
+  @apply w-full border border-terminal-text/35 bg-black/30 px-3 py-2 text-sm text-terminal-text outline-none transition-colors duration-fast placeholder:text-terminal-muted/70 focus:border-terminal-accent;
+}
+
+.cursor-blink::after {
+  content: '_';
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--accent);
+  animation: blink 1s step-start infinite;
+}

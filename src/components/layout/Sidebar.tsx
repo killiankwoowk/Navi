@@ -1,0 +1,31 @@
+import { NavLink } from 'react-router-dom'
+
+const links = [
+  { to: '/library', label: '> Library' },
+  { to: '/artists', label: '> Artists' },
+  { to: '/search', label: '> Search' },
+  { to: '/playlists', label: '> Playlists' },
+]
+
+export const Sidebar = () => (
+  <aside className="terminal-panel h-full min-h-0">
+    <div className="terminal-heading"># Navigation</div>
+    <nav className="space-y-1 p-2 text-xs uppercase tracking-[0.15em]">
+      {links.map((link) => (
+        <NavLink
+          key={link.to}
+          to={link.to}
+          className={({ isActive }) =>
+            `block border px-2 py-2 transition-colors duration-fast ${
+              isActive
+                ? 'border-terminal-accent bg-terminal-accent/10 text-terminal-accent'
+                : 'border-terminal-text/15 text-terminal-muted hover:border-terminal-text/45 hover:text-terminal-text'
+            }`
+          }
+        >
+          {link.label}
+        </NavLink>
+      ))}
+    </nav>
+  </aside>
+)
