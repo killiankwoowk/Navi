@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { ListMusic, MessageSquareText } from 'lucide-react'
 
+import type { ViewportMode } from '@/api/types'
+import { LyricsPanel } from '@/components/Lyrics/LyricsPanel'
+import { DesktopPlayerBar } from '@/components/player/DesktopPlayerBar'
+import { FullPlayer } from '@/components/player/FullPlayer'
+import { MiniPlayer } from '@/components/player/MiniPlayer'
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { audioEngine } from '@/player/audioEngine'
 import { getCurrentQueueItem } from '@/player/playback'
@@ -11,16 +15,11 @@ import { useUsageStore } from '@/store/usageStore'
 import { getSongCoverArtId } from '@/utils/image'
 import { getMaxBitRateForQuality } from '@/utils/stream'
 
-import { LyricsPanel } from '@/components/Lyrics/LyricsPanel'
-import { QueuePanel } from '@/components/player/QueuePanel'
-import { NowPlaying } from '@/components/player/NowPlaying'
-import { ProgressBar } from '@/components/player/ProgressBar'
-import { QualityControl } from '@/components/player/QualityControl'
-import { TransportControls } from '@/components/player/TransportControls'
-import { VolumeControl } from '@/components/player/VolumeControl'
-import { SleepTimerControl } from '@/components/sleep/SleepTimerControl'
+interface BottomPlayerProps {
+  viewportMode: ViewportMode
+}
 
-export const BottomPlayer = () => {
+export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   const queue = usePlayerStore((state) => state.queue)
   const currentTrackId = usePlayerStore((state) => state.currentTrackId)
   const isPlaying = usePlayerStore((state) => state.isPlaying)
@@ -31,9 +30,6 @@ export const BottomPlayer = () => {
   const volume = usePlayerStore((state) => state.volume)
   const sleepTimer = usePlayerStore((state) => state.sleepTimer)
 
-  const playIndex = usePlayerStore((state) => state.playIndex)
-  const removeFromQueue = usePlayerStore((state) => state.removeFromQueue)
-  const reorderQueue = usePlayerStore((state) => state.reorderQueue)
   const togglePlay = usePlayerStore((state) => state.togglePlay)
   const next = usePlayerStore((state) => state.next)
   const previous = usePlayerStore((state) => state.previous)
@@ -51,14 +47,17 @@ export const BottomPlayer = () => {
   const setAudioQuality = useSettingsStore((state) => state.setAudioQuality)
   const defaultSleepTimer = useSettingsStore((state) => state.defaultSleepTimer)
 
-  const queuePanelOpen = useUiStore((state) => state.queuePanelOpen)
-  const setQueuePanelOpen = useUiStore((state) => state.setQueuePanelOpen)
   const lyricsPanelOpen = useUiStore((state) => state.lyricsPanelOpen)
   const lyricsTargetSong = useUiStore((state) => state.lyricsTargetSong)
   const openLyricsPanel = useUiStore((state) => state.openLyricsPanel)
   const closeLyricsPanel = useUiStore((state) => state.closeLyricsPanel)
   const streamQualityWarning = useUiStore((state) => state.streamQualityWarning)
   const setStreamQualityWarning = useUiStore((state) => state.setStreamQualityWarning)
+  const desktopQueueCollapsed = useUiStore((state) => state.desktopQueueCollapsed)
+  const setDesktopQueueCollapsed = useUiStore((state) => state.setDesktopQueueCollapsed)
+  const setMobileQueueOpen = useUiStore((state) => state.setMobileQueueOpen)
+  const mobilePlayerExpanded = useUiStore((state) => state.mobilePlayerExpanded)
+  const setMobilePlayerExpanded = useUiStore((state) => state.setMobilePlayerExpanded)
 
   const currentIndex = useMemo(() => queue.findIndex((item) => item.track.id === currentTrackId), [currentTrackId, queue])
   const currentItem = useMemo(() => getCurrentQueueItem(queue, currentTrackId), [currentTrackId, queue])
@@ -71,8 +70,9 @@ export const BottomPlayer = () => {
   const coverUrl = useMemo(() => {
     const coverArtId = getSongCoverArtId(currentItem?.track)
     if (!coverArtId || !client) return undefined
-    return client.getCoverArt(coverArtId, 120)
-  }, [client, currentItem])
+    const size = viewportMode === 'mobile' ? 600 : viewportMode === 'tablet' ? 400 : 200
+    return client.getCoverArt(coverArtId, size)
+  }, [client, currentItem, viewportMode])
 
   useEffect(() => {
     audioEngine.setVolume(volume)
@@ -115,7 +115,7 @@ export const BottomPlayer = () => {
         }
       })
       .catch(() => {
-        // Probe is best-effort only.
+        // Best effort.
       })
       .finally(() => {
         warnedBitrateProbeRef.current.add(probeKey)
@@ -154,125 +154,111 @@ export const BottomPlayer = () => {
     return () => window.clearInterval(timer)
   }, [checkSleepTimer])
 
-  useEffect(() => {
-    if (!queuePanelOpen && streamQualityWarning) {
-      const timer = window.setTimeout(() => setStreamQualityWarning(null), 7000)
-      return () => window.clearTimeout(timer)
+  const handleToggleQueue = () => {
+    if (viewportMode === 'desktop') {
+      setDesktopQueueCollapsed(!desktopQueueCollapsed)
+      return
     }
-    return undefined
-  }, [queuePanelOpen, setStreamQualityWarning, streamQualityWarning])
+    setMobileQueueOpen(true)
+  }
+
+  const handleToggleLyrics = () => {
+    if (lyricsPanelOpen) {
+      closeLyricsPanel()
+      return
+    }
+    openLyricsPanel(currentItem?.track ?? null)
+  }
 
   return (
     <>
-      <footer className="terminal-panel sticky bottom-0 mx-3 mb-3 mt-3 p-3">
-        <div className="grid gap-3 lg:grid-cols-[1.2fr_2fr_1fr] lg:items-center">
-          <NowPlaying track={currentItem?.track ?? null} coverUrl={coverUrl} />
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <TransportControls
-                isPlaying={isPlaying}
-                shuffle={shuffle}
-                repeat={repeat}
-                onTogglePlay={togglePlay}
-                onPrevious={() => {
-                  previous(audioEngine.element.currentTime)
-                  if (audioEngine.element.currentTime > 5) {
-                    audioEngine.seek(0)
-                  }
-                }}
-                onNext={next}
-                onToggleShuffle={toggleShuffle}
-                onCycleRepeat={cycleRepeat}
-              />
-              <div className="flex items-center gap-2">
-                <QualityControl value={audioQuality} onChange={setAudioQuality} compact />
-                <button
-                  className={`terminal-button min-h-11 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-terminal-green ${
-                    lyricsPanelOpen ? 'border-terminal-accent text-terminal-accent' : ''
-                  }`}
-                  type="button"
-                  onClick={() => (lyricsPanelOpen ? closeLyricsPanel() : openLyricsPanel(currentItem?.track ?? null))}
-                  aria-label="Toggle lyrics panel"
-                >
-                  <MessageSquareText size={14} />
-                  lyrics
-                </button>
-                <button
-                  className={`terminal-button hidden min-h-11 items-center gap-2 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-terminal-green md:inline-flex ${
-                    queuePanelOpen ? 'border-terminal-accent text-terminal-accent' : ''
-                  }`}
-                  type="button"
-                  onClick={() => setQueuePanelOpen(!queuePanelOpen)}
-                  aria-label="Toggle queue panel"
-                >
-                  <ListMusic size={14} />
-                  queue
-                  <span className="rounded-sm border border-terminal-text/40 px-1 text-[10px]">{queue.length}</span>
-                </button>
-                <VolumeControl volume={volume} onChange={setVolume} />
-              </div>
-            </div>
-            <ProgressBar
-              progress={progress}
-              duration={duration}
-              onSeek={(value) => {
-                audioEngine.seek(value)
-                setProgress(value)
-              }}
-            />
-            {streamQualityWarning ? (
-              <div className="border border-terminal-warn/70 bg-terminal-warn/10 px-2 py-1 text-[11px] text-terminal-warn">
-                {streamQualityWarning}
-              </div>
-            ) : null}
-          </div>
-          <div className="space-y-2 text-right">
-            <SleepTimerControl
-              endsAt={sleepTimer.endsAt}
-              durationMinutes={sleepTimer.durationMinutes}
-              defaultDuration={defaultSleepTimer}
-              onSetTimer={setSleepTimer}
-              onCancel={clearSleepTimer}
-            />
-            <QualityControl value={audioQuality} onChange={setAudioQuality} />
-            <div className="text-xs text-terminal-muted">
-              [{currentIndex + 1}/{queue.length || 0}] {currentItem?.track.album ?? '--'}
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      <button
-        className={`fixed bottom-28 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full border border-terminal-accent bg-terminal-panel text-terminal-accent shadow-terminal focus:outline-none focus:ring-2 focus:ring-terminal-green md:hidden ${
-          queuePanelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
-        type="button"
-        onClick={() => setQueuePanelOpen(true)}
-        aria-label="Open queue"
-      >
-        <ListMusic size={18} />
-        <span className="absolute -right-1 -top-1 min-w-5 rounded-full border border-terminal-accent bg-black px-1 text-[10px]">
-          {queue.length}
-        </span>
-      </button>
-
-      {queuePanelOpen ? (
-        <QueuePanel
-          queue={queue}
-          currentTrackId={currentTrackId}
-          onSelect={playIndex}
-          onRemove={removeFromQueue}
-          onMove={reorderQueue}
-          onClose={() => setQueuePanelOpen(false)}
+      {viewportMode === 'mobile' ? (
+        <>
+          <MiniPlayer
+            track={currentItem?.track ?? null}
+            isPlaying={isPlaying}
+            queueCount={queue.length}
+            onTogglePlay={togglePlay}
+            onExpand={() => setMobilePlayerExpanded(true)}
+            onOpenQueue={handleToggleQueue}
+          />
+          <FullPlayer
+            open={mobilePlayerExpanded}
+            track={currentItem?.track ?? null}
+            coverUrl={coverUrl}
+            isPlaying={isPlaying}
+            shuffle={shuffle}
+            repeat={repeat}
+            progress={progress}
+            duration={duration}
+            audioQuality={audioQuality}
+            queueCount={queue.length}
+            onClose={() => setMobilePlayerExpanded(false)}
+            onTogglePlay={togglePlay}
+            onPrevious={() => {
+              previous(audioEngine.element.currentTime)
+              if (audioEngine.element.currentTime > 5) audioEngine.seek(0)
+            }}
+            onNext={next}
+            onToggleShuffle={toggleShuffle}
+            onCycleRepeat={cycleRepeat}
+            onSeek={(value) => {
+              audioEngine.seek(value)
+              setProgress(value)
+            }}
+            onToggleLyrics={handleToggleLyrics}
+            onOpenQueue={handleToggleQueue}
+            onQualityChange={setAudioQuality}
+          />
+        </>
+      ) : (
+        <DesktopPlayerBar
+          track={currentItem?.track ?? null}
+          coverUrl={coverUrl}
+          queueLength={queue.length}
+          currentIndex={currentIndex}
+          isPlaying={isPlaying}
+          shuffle={shuffle}
+          repeat={repeat}
+          progress={progress}
+          duration={duration}
+          volume={volume}
+          audioQuality={audioQuality}
+          defaultSleepTimer={defaultSleepTimer}
+          queueActive={!desktopQueueCollapsed}
+          lyricsActive={lyricsPanelOpen}
+          onTogglePlay={togglePlay}
+          onPrevious={() => {
+            previous(audioEngine.element.currentTime)
+            if (audioEngine.element.currentTime > 5) audioEngine.seek(0)
+          }}
+          onNext={next}
+          onToggleShuffle={toggleShuffle}
+          onCycleRepeat={cycleRepeat}
+          onSeek={(value) => {
+            audioEngine.seek(value)
+            setProgress(value)
+          }}
+          onVolumeChange={setVolume}
+          onQualityChange={setAudioQuality}
+          onSetSleepTimer={setSleepTimer}
+          onCancelSleepTimer={clearSleepTimer}
+          sleepEndsAt={sleepTimer.endsAt}
+          sleepDurationMinutes={sleepTimer.durationMinutes}
+          onToggleLyrics={handleToggleLyrics}
+          onToggleQueue={handleToggleQueue}
+          warningMessage={streamQualityWarning}
+        />
+      )}
+      {lyricsPanelOpen ? (
+        <LyricsPanel
+          open={lyricsPanelOpen}
+          song={lyricsSong}
+          currentTimeSec={progress}
+          isPlaying={isPlaying}
+          onClose={closeLyricsPanel}
         />
       ) : null}
-      <LyricsPanel
-        open={lyricsPanelOpen}
-        song={lyricsSong}
-        currentTimeSec={progress}
-        isPlaying={isPlaying}
-        onClose={closeLyricsPanel}
-      />
     </>
   )
 }

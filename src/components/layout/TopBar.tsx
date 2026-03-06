@@ -1,19 +1,40 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LogOut, Search } from 'lucide-react'
 
 import { AsciiLogo } from '@/components/common/AsciiLogo'
 import { useAuth } from '@/features/auth/useAuth'
+import { useViewportMode } from '@/hooks/useViewportMode'
 
 export const TopBar = () => {
   const navigate = useNavigate()
   const { logout } = useAuth()
+  const viewportMode = useViewportMode()
   const [searchInput, setSearchInput] = useState('')
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const q = searchInput.trim()
     navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search')
+  }
+
+  if (viewportMode === 'mobile') {
+    return (
+      <header className="terminal-panel mx-2 mt-2">
+        <div className="flex items-center justify-between px-3 py-2">
+          <div className="text-xs uppercase tracking-[0.16em] text-terminal-accent">Navi Terminal</div>
+          <div className="flex items-center gap-2">
+            <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button" aria-label="Open search">
+              <Search size={14} />
+            </button>
+            <button className="terminal-button min-h-11 px-2 py-1" onClick={logout} type="button" aria-label="Logout">
+              <LogOut size={14} />
+            </button>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   return (
@@ -23,33 +44,38 @@ export const TopBar = () => {
           <AsciiLogo />
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <form className="flex min-w-[240px] items-center gap-2" onSubmit={onSubmit}>
-            <span className="text-xs text-terminal-muted">$</span>
-            <input
-              className="terminal-input h-9"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="search artists albums songs"
-              aria-label="Global search"
-            />
-            <button className="terminal-button h-9" type="submit">
-              run
+          {viewportMode === 'desktop' ? (
+            <form className="flex min-w-[240px] items-center gap-2" onSubmit={onSubmit}>
+              <span className="text-xs text-terminal-muted">$</span>
+              <input
+                className="terminal-input h-9"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder="search artists albums songs"
+                aria-label="Global search"
+              />
+              <button className="terminal-button h-9" type="submit">
+                run
+              </button>
+            </form>
+          ) : (
+            <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button">
+              <Search size={14} />
+              search
             </button>
-          </form>
-          <button className="terminal-button h-9" onClick={() => navigate('/profile')} type="button">
+          )}
+          <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/profile')} type="button">
             profile
           </button>
-          <button className="terminal-button h-9" onClick={() => navigate('/settings')} type="button">
+          <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/settings')} type="button">
             settings
           </button>
-          <button className="terminal-button h-9" onClick={logout} type="button">
+          <button className="terminal-button min-h-11 px-2 py-1" onClick={logout} type="button">
             logout
-          </button>
-          <button className="terminal-button h-9 md:hidden" onClick={() => navigate('/playlists')} type="button">
-            queue
           </button>
         </div>
       </div>
     </header>
   )
 }
+

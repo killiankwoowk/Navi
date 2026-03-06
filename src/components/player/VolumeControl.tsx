@@ -4,7 +4,7 @@ interface VolumeControlProps {
 }
 
 export const VolumeControl = ({ volume, onChange }: VolumeControlProps) => (
-  <div className="grid w-36 grid-cols-[auto_1fr] items-center gap-2 text-xs">
+  <div className="grid w-32 grid-cols-[auto_1fr] items-center gap-2 text-xs md:w-36">
     <span className="text-terminal-muted">vol</span>
     <input
       type="range"
@@ -13,7 +13,7 @@ export const VolumeControl = ({ volume, onChange }: VolumeControlProps) => (
       step={0.01}
       value={volume}
       onChange={(event) => onChange(Number(event.target.value))}
-      className="h-1 cursor-pointer appearance-none bg-terminal-text/30 accent-[#00ff9c]"
+      className="h-2 cursor-pointer appearance-none bg-terminal-text/30 accent-[#00ff9c]"
     />
   </div>
 )

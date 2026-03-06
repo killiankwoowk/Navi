@@ -9,19 +9,24 @@ import { TerminalPanel } from '@/components/common/TerminalPanel'
 import { useSearchQuery } from '@/features/search/useSearch'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useViewportMode } from '@/hooks/useViewportMode'
 import { usePlayerStore } from '@/store/playerStore'
+import { useUiStore } from '@/store/uiStore'
 import { SEARCH_DEBOUNCE_MS } from '@/utils/constants'
 import { formatDuration } from '@/utils/format'
 
 export const SearchPage = () => {
   useDocumentTitle('Search | Navi Terminal Player')
 
+  const viewportMode = useViewportMode()
   const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q') ?? ''
   const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS)
   const searchQuery = useSearchQuery(debouncedQuery)
   const setQueue = usePlayerStore((state) => state.setQueue)
   const addToQueue = usePlayerStore((state) => state.addToQueue)
+  const mobileSearchTab = useUiStore((state) => state.mobileSearchTab)
+  const setMobileSearchTab = useUiStore((state) => state.setMobileSearchTab)
 
   const syncQueryParam = (value: string) => {
     if (!value.trim()) {
@@ -37,6 +42,7 @@ export const SearchPage = () => {
   }
 
   const songs = useMemo(() => searchQuery.data?.song ?? [], [searchQuery.data?.song])
+  const isMobile = viewportMode === 'mobile'
 
   return (
     <TerminalPanel
@@ -44,66 +50,89 @@ export const SearchPage = () => {
       rightSlot={
         <form className="flex items-center gap-2" onSubmit={onSubmit}>
           <input
-            className="h-8 w-52 border border-terminal-text/35 bg-black/35 px-2 text-[11px] uppercase tracking-[0.12em] text-terminal-text"
+            className={`terminal-input ${isMobile ? 'h-11 w-44' : 'h-8 w-52'} px-2 text-[11px] uppercase tracking-[0.12em]`}
             placeholder="query"
             value={query}
+            aria-label="Search query"
             onChange={(event) => {
               syncQueryParam(event.target.value)
             }}
           />
-          <button className="terminal-button h-8 px-2" type="submit">
+          <button className={`terminal-button ${isMobile ? 'min-h-11' : 'h-8'} px-2`} type="submit">
             search
           </button>
         </form>
       }
     >
+      {isMobile ? (
+        <div className="mb-3 flex items-center gap-1">
+          {(['songs', 'albums', 'artists'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={`terminal-button min-h-11 px-2 py-1 ${mobileSearchTab === tab ? 'border-terminal-accent text-terminal-accent' : ''}`}
+              onClick={() => setMobileSearchTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {searchQuery.isFetching ? <LoadingRows rows={4} /> : null}
       {!searchQuery.isFetching && !debouncedQuery.trim() ? <EmptyState title="Type to search artists, albums, songs." /> : null}
       {searchQuery.data ? (
-        <div className="grid gap-3 xl:grid-cols-3">
-          <section className="space-y-2">
-            <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">artists</h3>
-            {(searchQuery.data.artist ?? []).map((artist) => (
-              <Link
-                key={artist.id}
-                to={`/artist/${artist.id}`}
-                className="block border border-terminal-text/25 px-2 py-1 text-sm hover:border-terminal-accent hover:text-terminal-accent"
-              >
-                {artist.name}
-              </Link>
-            ))}
-          </section>
-          <section className="space-y-2">
-            <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">albums</h3>
-            {(searchQuery.data.album ?? []).map((album) => (
-              <Link
-                key={album.id}
-                to={`/album/${album.id}`}
-                className="block border border-terminal-text/25 px-2 py-1 text-sm hover:border-terminal-accent hover:text-terminal-accent"
-              >
-                {album.name}
-              </Link>
-            ))}
-          </section>
-          <section className="space-y-2">
-            <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">songs</h3>
-            {songs.map((song, index) => (
-              <div key={song.id} className="grid grid-cols-[1fr_auto] items-center gap-1 border border-terminal-text/25 px-2 py-1">
-                <button className="truncate text-left text-sm" type="button" onClick={() => setQueue(songs, index, true)}>
-                  {song.title}
-                </button>
-                <div className="flex items-center gap-1 text-[11px]">
-                  <span className="text-terminal-muted">{formatDuration(song.duration ?? 0)}</span>
-                  <button className="terminal-button px-1 py-0" type="button" onClick={() => addToQueue([song])}>
-                    +q
+        <div className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'xl:grid-cols-3'}`}>
+          {(mobileSearchTab === 'artists' || !isMobile) && (
+            <section className="space-y-2">
+              <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">artists</h3>
+              {(searchQuery.data.artist ?? []).map((artist) => (
+                <Link
+                  key={artist.id}
+                  to={`/artist/${artist.id}`}
+                  className="block min-h-11 border border-terminal-text/25 px-2 py-2 text-sm hover:border-terminal-accent hover:text-terminal-accent"
+                >
+                  {artist.name}
+                </Link>
+              ))}
+            </section>
+          )}
+          {(mobileSearchTab === 'albums' || !isMobile) && (
+            <section className="space-y-2">
+              <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">albums</h3>
+              {(searchQuery.data.album ?? []).map((album) => (
+                <Link
+                  key={album.id}
+                  to={`/album/${album.id}`}
+                  className="block min-h-11 border border-terminal-text/25 px-2 py-2 text-sm hover:border-terminal-accent hover:text-terminal-accent"
+                >
+                  {album.name}
+                </Link>
+              ))}
+            </section>
+          )}
+          {(mobileSearchTab === 'songs' || !isMobile) && (
+            <section className="space-y-2">
+              <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">songs</h3>
+              {songs.map((song, index) => (
+                <div key={song.id} className="grid grid-cols-[1fr_auto] items-center gap-1 border border-terminal-text/25 px-2 py-1">
+                  <button className="min-h-11 truncate text-left text-sm" type="button" onClick={() => setQueue(songs, index, true)}>
+                    {song.title}
                   </button>
-                  <AddToPlaylistMenu songId={song.id} />
+                  <div className="flex items-center gap-1 text-[11px]">
+                    <span className="text-terminal-muted">{formatDuration(song.duration ?? 0)}</span>
+                    <button className="terminal-button min-h-11 px-1 py-0" type="button" onClick={() => addToQueue([song])}>
+                      +q
+                    </button>
+                    <AddToPlaylistMenu songId={song.id} />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </section>
+              ))}
+            </section>
+          )}
         </div>
       ) : null}
     </TerminalPanel>
   )
 }
+

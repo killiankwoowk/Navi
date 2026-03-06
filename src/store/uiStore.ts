@@ -11,6 +11,11 @@ interface UiStore {
   lyricsPanelOpen: boolean
   lyricsTargetSong: Song | null
   streamQualityWarning: string | null
+  desktopSidebarCollapsed: boolean
+  desktopQueueCollapsed: boolean
+  mobilePlayerExpanded: boolean
+  mobileQueueOpen: boolean
+  mobileSearchTab: 'songs' | 'albums' | 'artists'
   setQueuePanelOpen: (value: boolean) => void
   toggleQueuePanel: () => void
   setCompactMode: (value: boolean) => void
@@ -19,6 +24,11 @@ interface UiStore {
   openLyricsPanel: (song?: Song | null) => void
   closeLyricsPanel: () => void
   setStreamQualityWarning: (message: string | null) => void
+  setDesktopSidebarCollapsed: (value: boolean) => void
+  setDesktopQueueCollapsed: (value: boolean) => void
+  setMobilePlayerExpanded: (value: boolean) => void
+  setMobileQueueOpen: (value: boolean) => void
+  setMobileSearchTab: (value: 'songs' | 'albums' | 'artists') => void
 }
 
 export const useUiStore = create<UiStore>()(
@@ -31,6 +41,11 @@ export const useUiStore = create<UiStore>()(
       lyricsPanelOpen: false,
       lyricsTargetSong: null,
       streamQualityWarning: null,
+      desktopSidebarCollapsed: false,
+      desktopQueueCollapsed: false,
+      mobilePlayerExpanded: false,
+      mobileQueueOpen: false,
+      mobileSearchTab: 'songs',
       setQueuePanelOpen: (value) => set({ queuePanelOpen: value }),
       toggleQueuePanel: () => set((state) => ({ queuePanelOpen: !state.queuePanelOpen })),
       setCompactMode: (value) => set({ compactMode: value }),
@@ -39,6 +54,11 @@ export const useUiStore = create<UiStore>()(
       openLyricsPanel: (song) => set({ lyricsPanelOpen: true, lyricsTargetSong: song ?? null }),
       closeLyricsPanel: () => set({ lyricsPanelOpen: false, lyricsTargetSong: null }),
       setStreamQualityWarning: (streamQualityWarning) => set({ streamQualityWarning }),
+      setDesktopSidebarCollapsed: (desktopSidebarCollapsed) => set({ desktopSidebarCollapsed }),
+      setDesktopQueueCollapsed: (desktopQueueCollapsed) => set({ desktopQueueCollapsed }),
+      setMobilePlayerExpanded: (mobilePlayerExpanded) => set({ mobilePlayerExpanded }),
+      setMobileQueueOpen: (mobileQueueOpen) => set({ mobileQueueOpen }),
+      setMobileSearchTab: (mobileSearchTab) => set({ mobileSearchTab }),
     }),
     {
       name: 'navi-ui',
@@ -48,6 +68,10 @@ export const useUiStore = create<UiStore>()(
         libraryAlbumType: state.libraryAlbumType,
         playlistViewMode: state.playlistViewMode,
         lyricsPanelOpen: state.lyricsPanelOpen,
+        desktopSidebarCollapsed: state.desktopSidebarCollapsed,
+        desktopQueueCollapsed: state.desktopQueueCollapsed,
+        mobilePlayerExpanded: state.mobilePlayerExpanded,
+        mobileSearchTab: state.mobileSearchTab,
       }),
     },
   ),

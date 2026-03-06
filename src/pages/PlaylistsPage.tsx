@@ -41,21 +41,23 @@ export const PlaylistsPage = () => {
         <div className="grid gap-3 lg:grid-cols-[280px_1fr]">
           <aside className="space-y-1">
             {playlistsQuery.isLoading ? <LoadingRows rows={4} /> : null}
-            {(playlistsQuery.data ?? []).map((playlist) => (
-              <button
-                key={playlist.id}
-                className={`block w-full border px-3 py-2 text-left text-sm ${
-                  playlist.id === selectedPlaylistId
-                    ? 'border-terminal-accent text-terminal-accent'
-                    : 'border-terminal-text/20 hover:border-terminal-accent/70'
-                }`}
-                type="button"
-                onClick={() => setSelectedId(playlist.id)}
-              >
-                {playlist.name}
-                <span className="ml-2 text-[11px] text-terminal-muted">[{playlist.songCount ?? 0}]</span>
-              </button>
-            ))}
+            <div className="flex gap-1 overflow-auto lg:block lg:space-y-1">
+              {(playlistsQuery.data ?? []).map((playlist) => (
+                <button
+                  key={playlist.id}
+                  className={`min-h-11 shrink-0 border px-3 py-2 text-left text-sm lg:block lg:w-full ${
+                    playlist.id === selectedPlaylistId
+                      ? 'border-terminal-accent text-terminal-accent'
+                      : 'border-terminal-text/20 hover:border-terminal-accent/70'
+                  }`}
+                  type="button"
+                  onClick={() => setSelectedId(playlist.id)}
+                >
+                  {playlist.name}
+                  <span className="ml-2 text-[11px] text-terminal-muted">[{playlist.songCount ?? 0}]</span>
+                </button>
+              ))}
+            </div>
             {!playlistsQuery.isLoading && (playlistsQuery.data?.length ?? 0) === 0 ? (
               <EmptyState title="No playlists yet." hint="Create one from the button above." />
             ) : null}

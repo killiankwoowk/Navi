@@ -1,50 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FixedSizeList as List, type ListChildComponentProps } from 'react-window'
 
 import type { Album } from '@/api/types'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingRows } from '@/components/common/LoadingRows'
 import { TerminalPanel } from '@/components/common/TerminalPanel'
+import { ResponsiveAlbumGrid } from '@/components/albums/ResponsiveAlbumGrid'
 import { AlbumCard } from '@/components/home/AlbumCard'
 import { CarouselRow } from '@/components/home/CarouselRow'
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { useAlbumListQuery } from '@/features/library/useLibrary'
 import { usePlaylistsQuery } from '@/features/playlists/usePlaylists'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useResponsiveCoverSize } from '@/hooks/useResponsiveCoverSize'
 import { usePlayerStore } from '@/store/playerStore'
-
-interface GridRowData {
-  items: Album[]
-  columns: number
-  coverUrlForAlbum: (album: Album) => string | undefined
-  playAlbum: (album: Album, queueOnly?: boolean) => void
-  openAlbum: (albumId: string) => void
-}
-
-const rowHeight = 330
-const minColumnWidth = 250
-
-const GridRow = ({ data, index, style }: ListChildComponentProps<GridRowData>) => {
-  const start = index * data.columns
-  const rowItems = data.items.slice(start, start + data.columns)
-  const mergedStyle = { ...style, display: 'grid', gridTemplateColumns: `repeat(${data.columns}, minmax(0, 1fr))` }
-
-  return (
-    <div style={mergedStyle} className="gap-2 px-1 py-1">
-      {rowItems.map((album) => (
-        <AlbumCard
-          key={album.id}
-          album={album}
-          coverUrl={data.coverUrlForAlbum(album)}
-          onPlay={() => data.playAlbum(album)}
-          onQueue={() => data.playAlbum(album, true)}
-          onOpen={() => data.openAlbum(album.id)}
-        />
-      ))}
-    </div>
-  )
-}
 
 export const HomeDashboard = () => {
   useDocumentTitle('Home | Navi Terminal Player')
@@ -54,46 +23,20 @@ export const HomeDashboard = () => {
   const addToQueue = usePlayerStore((state) => state.addToQueue)
 
   const client = useMemo(() => getNavidromeClientOrNull(), [])
-  const recentlyAdded = useAlbumListQuery('newest', 30, 0)
-  const topAlbums = useAlbumListQuery('frequent', 30, 0)
-  const suggestedAlbums = useAlbumListQuery('alphabeticalByName', 30, 0)
+  const coverSize = useResponsiveCoverSize('card')
+  const heroCoverSize = useResponsiveCoverSize('hero')
+  const recentlyAdded = useAlbumListQuery('newest', 40, 0)
+  const topAlbums = useAlbumListQuery('frequent', 40, 0)
+  const suggestedAlbums = useAlbumListQuery('alphabeticalByName', 40, 0)
   const playlists = usePlaylistsQuery()
 
-  const [gridWidth, setGridWidth] = useState(1000)
-  const [gridHeight, setGridHeight] = useState(() =>
-    typeof window === 'undefined' ? 620 : Math.max(320, window.innerHeight - 400),
-  )
-  const [gridContainer, setGridContainer] = useState<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const onResize = () => setGridHeight(Math.max(320, window.innerHeight - 400))
-    window.addEventListener('resize', onResize)
-
-    if (!gridContainer) {
-      return () => {
-        window.removeEventListener('resize', onResize)
-      }
-    }
-
-    const observer = new ResizeObserver((entries) => {
-      const nextWidth = Math.floor(entries[0]?.contentRect.width ?? 1000)
-      if (nextWidth > 0) setGridWidth(nextWidth)
-    })
-    observer.observe(gridContainer)
-
-    return () => {
-      observer.disconnect()
-      window.removeEventListener('resize', onResize)
-    }
-  }, [gridContainer])
-
   const coverUrlForAlbum = useCallback(
-    (album: Album) => {
+    (album: Album, size = coverSize) => {
       const coverId = album.coverArt || album.id
       if (!coverId || !client) return undefined
-      return client.getCoverArt(coverId, 480)
+      return client.getCoverArt(coverId, size)
     },
-    [client],
+    [client, coverSize],
   )
 
   const playAlbum = useCallback(
@@ -111,8 +54,6 @@ export const HomeDashboard = () => {
     [addToQueue, client, setQueue],
   )
 
-  const openAlbum = useCallback((albumId: string) => navigate(`/album/${albumId}`), [navigate])
-
   const featuredAlbums = useMemo(() => (recentlyAdded.data ?? []).slice(0, 8), [recentlyAdded.data])
   const mainFeed = useMemo(() => {
     const map = new Map<string, Album>()
@@ -121,10 +62,6 @@ export const HomeDashboard = () => {
     }
     return Array.from(map.values())
   }, [recentlyAdded.data, suggestedAlbums.data, topAlbums.data])
-
-  const columns = Math.max(1, Math.floor(gridWidth / minColumnWidth))
-  const rowCount = Math.ceil(mainFeed.length / columns)
-  const useVirtualizedGrid = mainFeed.length > 180
 
   return (
     <TerminalPanel title="Home Dashboard" className="space-y-3">
@@ -136,13 +73,13 @@ export const HomeDashboard = () => {
       {featuredAlbums.length > 0 ? (
         <CarouselRow title="Featured">
           {featuredAlbums.map((album) => (
-            <div key={`featured-${album.id}`} className="min-w-[220px] max-w-[220px]">
+            <div key={`featured-${album.id}`} className="min-w-[180px] max-w-[220px] sm:min-w-[220px] sm:max-w-[260px]">
               <AlbumCard
                 album={album}
-                coverUrl={coverUrlForAlbum(album)}
+                coverUrl={coverUrlForAlbum(album, heroCoverSize)}
                 onPlay={() => playAlbum(album)}
                 onQueue={() => playAlbum(album, true)}
-                onOpen={() => openAlbum(album.id)}
+                onOpen={() => navigate(`/album/${album.id}`)}
               />
             </div>
           ))}
@@ -151,13 +88,13 @@ export const HomeDashboard = () => {
 
       <CarouselRow title="Recently Added">
         {(recentlyAdded.data ?? []).map((album) => (
-          <div key={`recent-${album.id}`} className="min-w-[190px] max-w-[190px]">
+          <div key={`recent-${album.id}`} className="min-w-[170px] max-w-[190px]">
             <AlbumCard
               album={album}
               coverUrl={coverUrlForAlbum(album)}
               onPlay={() => playAlbum(album)}
               onQueue={() => playAlbum(album, true)}
-              onOpen={() => openAlbum(album.id)}
+              onOpen={() => navigate(`/album/${album.id}`)}
             />
           </div>
         ))}
@@ -165,13 +102,13 @@ export const HomeDashboard = () => {
 
       <CarouselRow title="Top Albums">
         {(topAlbums.data ?? []).map((album) => (
-          <div key={`top-${album.id}`} className="min-w-[190px] max-w-[190px]">
+          <div key={`top-${album.id}`} className="min-w-[170px] max-w-[190px]">
             <AlbumCard
               album={album}
               coverUrl={coverUrlForAlbum(album)}
               onPlay={() => playAlbum(album)}
               onQueue={() => playAlbum(album, true)}
-              onOpen={() => openAlbum(album.id)}
+              onOpen={() => navigate(`/album/${album.id}`)}
             />
           </div>
         ))}
@@ -181,7 +118,7 @@ export const HomeDashboard = () => {
         {(playlists.data ?? []).map((playlist) => (
           <button
             key={playlist.id}
-            className="terminal-card min-w-[220px] px-3 py-3 text-left text-sm"
+            className="terminal-card min-h-24 min-w-[200px] px-3 py-3 text-left text-sm"
             onClick={() => navigate('/playlists')}
             type="button"
           >
@@ -193,13 +130,13 @@ export const HomeDashboard = () => {
 
       <CarouselRow title="Suggested">
         {(suggestedAlbums.data ?? []).map((album) => (
-          <div key={`suggested-${album.id}`} className="min-w-[190px] max-w-[190px]">
+          <div key={`suggested-${album.id}`} className="min-w-[170px] max-w-[190px]">
             <AlbumCard
               album={album}
               coverUrl={coverUrlForAlbum(album)}
               onPlay={() => playAlbum(album)}
               onQueue={() => playAlbum(album, true)}
-              onOpen={() => openAlbum(album.id)}
+              onOpen={() => navigate(`/album/${album.id}`)}
             />
           </div>
         ))}
@@ -207,44 +144,15 @@ export const HomeDashboard = () => {
 
       <section className="space-y-2">
         <header className="text-xs uppercase tracking-[0.16em] text-terminal-muted">Main Feed Grid</header>
-        {useVirtualizedGrid ? (
-          <div ref={setGridContainer} className="playlist-viewport">
-            <List
-              className="terminal-carousel"
-              width={Math.max(gridWidth, 320)}
-              height={gridHeight}
-              itemCount={rowCount}
-              itemSize={rowHeight}
-              itemData={{
-                items: mainFeed,
-                columns,
-                coverUrlForAlbum,
-                playAlbum,
-                openAlbum,
-              }}
-              itemKey={(index, data) => data.items[index * data.columns]?.id ?? `main-feed-row-${index}`}
-            >
-              {GridRow}
-            </List>
-          </div>
-        ) : (
-          <div
-            ref={setGridContainer}
-            className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-          >
-            {mainFeed.map((album) => (
-              <AlbumCard
-                key={`main-${album.id}`}
-                album={album}
-                coverUrl={coverUrlForAlbum(album)}
-                onPlay={() => playAlbum(album)}
-                onQueue={() => playAlbum(album, true)}
-                onOpen={() => openAlbum(album.id)}
-              />
-            ))}
-          </div>
-        )}
+        <ResponsiveAlbumGrid
+          albums={mainFeed}
+          coverUrlForAlbum={coverUrlForAlbum}
+          onPlayAlbum={(album) => playAlbum(album)}
+          onQueueAlbum={(album) => playAlbum(album, true)}
+          onOpenAlbum={(albumId) => navigate(`/album/${albumId}`)}
+        />
       </section>
     </TerminalPanel>
   )
 }
+

@@ -24,19 +24,24 @@ export const TransportControls = ({
   onCycleRepeat,
 }: TransportControlsProps) => (
   <div className="flex items-center gap-2">
-    <button className={`terminal-button ${shuffle ? 'text-terminal-accent' : ''}`} type="button" onClick={onToggleShuffle}>
+    <button className={`terminal-button min-h-11 ${shuffle ? 'text-terminal-accent' : ''}`} type="button" onClick={onToggleShuffle} aria-label="Toggle shuffle">
       <Shuffle size={14} />
     </button>
-    <button className="terminal-button" type="button" onClick={onPrevious}>
+    <button className="terminal-button min-h-11" type="button" onClick={onPrevious} aria-label="Previous track">
       <SkipBack size={14} />
     </button>
-    <button className="terminal-button" type="button" onClick={onTogglePlay}>
+    <button className="terminal-button min-h-11" type="button" onClick={onTogglePlay} aria-label="Toggle playback">
       {isPlaying ? <Pause size={14} /> : <Play size={14} />}
     </button>
-    <button className="terminal-button" type="button" onClick={onNext}>
+    <button className="terminal-button min-h-11" type="button" onClick={onNext} aria-label="Next track">
       <SkipForward size={14} />
     </button>
-    <button className={`terminal-button ${repeat !== 'off' ? 'text-terminal-accent' : ''}`} type="button" onClick={onCycleRepeat}>
+    <button
+      className={`terminal-button min-h-11 ${repeat !== 'off' ? 'text-terminal-accent' : ''}`}
+      type="button"
+      onClick={onCycleRepeat}
+      aria-label="Cycle repeat mode"
+    >
       <Repeat size={14} />
       <span className="text-[10px]">{repeat}</span>
     </button>

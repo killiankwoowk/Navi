@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore'
 
 const LoginPage = lazy(() => import('@/pages/LoginPage').then((module) => ({ default: module.LoginPage })))
 const HomeDashboard = lazy(() => import('@/pages/HomeDashboard').then((module) => ({ default: module.HomeDashboard })))
+const AlbumsPage = lazy(() => import('@/pages/AlbumsPage').then((module) => ({ default: module.AlbumsPage })))
 const ArtistsPage = lazy(() => import('@/pages/ArtistsPage').then((module) => ({ default: module.ArtistsPage })))
 const ArtistDetailPage = lazy(() => import('@/pages/ArtistDetailPage').then((module) => ({ default: module.ArtistDetailPage })))
 const AlbumDetailPage = lazy(() => import('@/pages/AlbumDetailPage').then((module) => ({ default: module.AlbumDetailPage })))
@@ -85,6 +86,10 @@ export const router = createBrowserRouter([
       {
         path: '/artists',
         element: <ArtistsPage />,
+      },
+      {
+        path: '/albums',
+        element: <AlbumsPage />,
       },
       {
         path: '/artist/:id',

@@ -96,6 +96,9 @@ export type LyricsSource = 'auto' | 'genius' | 'local'
 export type ThemeMode = 'terminal-dark' | 'terminal-contrast'
 export type FontMode = 'jetbrains' | 'fira'
 export type SleepTimerDefault = 'off' | 15 | 30 | 60
+export type ViewportMode = 'mobile' | 'tablet' | 'desktop'
+export type PlayerDisplayMode = 'mini' | 'full'
+export type QueueDisplayMode = 'docked' | 'drawer'
 
 export interface LyricsEntry {
   time: number

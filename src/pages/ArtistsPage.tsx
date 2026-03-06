@@ -26,21 +26,22 @@ export const ArtistsPage = () => {
       title="Artists"
       rightSlot={
         <input
-          className="h-8 w-44 border border-terminal-text/35 bg-black/35 px-2 text-[11px] uppercase tracking-[0.12em] text-terminal-text"
+          className="terminal-input h-9 w-44 px-2 text-[11px] uppercase tracking-[0.12em]"
           placeholder="filter"
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
+          aria-label="Filter artists"
         />
       }
     >
       {artistsQuery.isLoading ? <LoadingRows /> : null}
       {!artistsQuery.isLoading && artists.length === 0 ? <EmptyState title="No artists found." /> : null}
-      <div className="grid gap-1 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         {artists.map((artist) => (
           <Link
             key={artist.id}
             to={`/artist/${artist.id}`}
-            className="border border-terminal-text/25 px-3 py-2 text-sm transition-colors hover:border-terminal-accent hover:text-terminal-accent"
+            className="terminal-card flex min-h-20 items-center border border-terminal-text/25 px-3 py-2 text-sm transition-colors hover:border-terminal-accent hover:text-terminal-accent"
           >
             <span className="text-terminal-muted">&gt; </span>
             {artist.name}

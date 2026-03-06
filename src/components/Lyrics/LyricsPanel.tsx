@@ -46,7 +46,7 @@ export const LyricsPanel = ({ open, song, currentTimeSec, isPlaying, onClose }: 
   if (!open) return null
 
   return (
-    <aside className="terminal-panel fixed bottom-24 right-3 z-40 flex h-[min(70vh,520px)] w-[min(480px,96vw)] flex-col">
+    <aside className="terminal-panel fixed inset-2 z-40 flex flex-col md:inset-auto md:bottom-24 md:right-3 md:h-[min(70vh,520px)] md:w-[min(480px,96vw)]">
       <header className="terminal-heading flex items-center justify-between gap-2">
         <span>lyrics | {song?.title ?? 'No track'}</span>
         <button className="terminal-button px-2 py-0.5" type="button" onClick={onClose} aria-label="Close lyrics panel">
