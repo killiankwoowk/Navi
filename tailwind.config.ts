@@ -7,6 +7,7 @@ export default {
     extend: {
       colors: {
         terminal: {
+          green: '#00ff9c',
           bg: '#050807',
           panel: '#09100d',
           text: '#00ff9c',

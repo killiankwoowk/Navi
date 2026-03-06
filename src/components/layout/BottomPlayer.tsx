@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { MessageSquareText } from 'lucide-react'
+import { ListMusic, MessageSquareText } from 'lucide-react'
 
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { audioEngine } from '@/player/audioEngine'
@@ -22,7 +22,7 @@ import { SleepTimerControl } from '@/components/sleep/SleepTimerControl'
 
 export const BottomPlayer = () => {
   const queue = usePlayerStore((state) => state.queue)
-  const currentIndex = usePlayerStore((state) => state.currentIndex)
+  const currentTrackId = usePlayerStore((state) => state.currentTrackId)
   const isPlaying = usePlayerStore((state) => state.isPlaying)
   const progress = usePlayerStore((state) => state.progress)
   const duration = usePlayerStore((state) => state.duration)
@@ -49,6 +49,7 @@ export const BottomPlayer = () => {
   const incrementPlay = useUsageStore((state) => state.incrementPlay)
   const audioQuality = useSettingsStore((state) => state.audioQuality)
   const setAudioQuality = useSettingsStore((state) => state.setAudioQuality)
+  const defaultSleepTimer = useSettingsStore((state) => state.defaultSleepTimer)
 
   const queuePanelOpen = useUiStore((state) => state.queuePanelOpen)
   const setQueuePanelOpen = useUiStore((state) => state.setQueuePanelOpen)
@@ -56,8 +57,11 @@ export const BottomPlayer = () => {
   const lyricsTargetSong = useUiStore((state) => state.lyricsTargetSong)
   const openLyricsPanel = useUiStore((state) => state.openLyricsPanel)
   const closeLyricsPanel = useUiStore((state) => state.closeLyricsPanel)
+  const streamQualityWarning = useUiStore((state) => state.streamQualityWarning)
+  const setStreamQualityWarning = useUiStore((state) => state.setStreamQualityWarning)
 
-  const currentItem = useMemo(() => getCurrentQueueItem(queue, currentIndex), [currentIndex, queue])
+  const currentIndex = useMemo(() => queue.findIndex((item) => item.track.id === currentTrackId), [currentTrackId, queue])
+  const currentItem = useMemo(() => getCurrentQueueItem(queue, currentTrackId), [currentTrackId, queue])
   const client = useMemo(() => getNavidromeClientOrNull(), [])
   const maxBitRate = useMemo(() => getMaxBitRateForQuality(audioQuality), [audioQuality])
   const lastTrackedSongIdRef = useRef<string | null>(null)
@@ -105,9 +109,9 @@ export const BottomPlayer = () => {
         const expectedSourceBytes = (currentItem.track.bitrate! * 1000 * currentItem.track.duration!) / 8
         const closeToSource = Math.abs(contentLength - expectedSourceBytes) / expectedSourceBytes < 0.12
         if (closeToSource) {
-          console.warn(
-            `[Navi] maxBitRate=${maxBitRate} requested for ${currentItem.track.title}, but stream size suggests original bitrate.`,
-          )
+          const warning = `Server may ignore maxBitRate=${maxBitRate} for ${currentItem.track.title}.`
+          setStreamQualityWarning(warning)
+          console.warn(`[Navi] ${warning}`)
         }
       })
       .catch(() => {
@@ -116,7 +120,7 @@ export const BottomPlayer = () => {
       .finally(() => {
         warnedBitrateProbeRef.current.add(probeKey)
       })
-  }, [client, currentItem, maxBitRate])
+  }, [client, currentItem, maxBitRate, setStreamQualityWarning])
 
   useEffect(() => {
     if (!currentItem) return
@@ -150,6 +154,14 @@ export const BottomPlayer = () => {
     return () => window.clearInterval(timer)
   }, [checkSleepTimer])
 
+  useEffect(() => {
+    if (!queuePanelOpen && streamQualityWarning) {
+      const timer = window.setTimeout(() => setStreamQualityWarning(null), 7000)
+      return () => window.clearTimeout(timer)
+    }
+    return undefined
+  }, [queuePanelOpen, setStreamQualityWarning, streamQualityWarning])
+
   return (
     <>
       <footer className="terminal-panel sticky bottom-0 mx-3 mb-3 mt-3 p-3">
@@ -175,13 +187,27 @@ export const BottomPlayer = () => {
               <div className="flex items-center gap-2">
                 <QualityControl value={audioQuality} onChange={setAudioQuality} compact />
                 <button
-                  className={`terminal-button px-2 py-1 ${lyricsPanelOpen ? 'border-terminal-accent text-terminal-accent' : ''}`}
+                  className={`terminal-button min-h-11 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-terminal-green ${
+                    lyricsPanelOpen ? 'border-terminal-accent text-terminal-accent' : ''
+                  }`}
                   type="button"
                   onClick={() => (lyricsPanelOpen ? closeLyricsPanel() : openLyricsPanel(currentItem?.track ?? null))}
                   aria-label="Toggle lyrics panel"
                 >
                   <MessageSquareText size={14} />
                   lyrics
+                </button>
+                <button
+                  className={`terminal-button hidden min-h-11 items-center gap-2 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-terminal-green md:inline-flex ${
+                    queuePanelOpen ? 'border-terminal-accent text-terminal-accent' : ''
+                  }`}
+                  type="button"
+                  onClick={() => setQueuePanelOpen(!queuePanelOpen)}
+                  aria-label="Toggle queue panel"
+                >
+                  <ListMusic size={14} />
+                  queue
+                  <span className="rounded-sm border border-terminal-text/40 px-1 text-[10px]">{queue.length}</span>
                 </button>
                 <VolumeControl volume={volume} onChange={setVolume} />
               </div>
@@ -194,11 +220,17 @@ export const BottomPlayer = () => {
                 setProgress(value)
               }}
             />
+            {streamQualityWarning ? (
+              <div className="border border-terminal-warn/70 bg-terminal-warn/10 px-2 py-1 text-[11px] text-terminal-warn">
+                {streamQualityWarning}
+              </div>
+            ) : null}
           </div>
           <div className="space-y-2 text-right">
             <SleepTimerControl
               endsAt={sleepTimer.endsAt}
               durationMinutes={sleepTimer.durationMinutes}
+              defaultDuration={defaultSleepTimer}
               onSetTimer={setSleepTimer}
               onCancel={clearSleepTimer}
             />
@@ -209,10 +241,25 @@ export const BottomPlayer = () => {
           </div>
         </div>
       </footer>
+
+      <button
+        className={`fixed bottom-28 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full border border-terminal-accent bg-terminal-panel text-terminal-accent shadow-terminal focus:outline-none focus:ring-2 focus:ring-terminal-green md:hidden ${
+          queuePanelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
+        type="button"
+        onClick={() => setQueuePanelOpen(true)}
+        aria-label="Open queue"
+      >
+        <ListMusic size={18} />
+        <span className="absolute -right-1 -top-1 min-w-5 rounded-full border border-terminal-accent bg-black px-1 text-[10px]">
+          {queue.length}
+        </span>
+      </button>
+
       {queuePanelOpen ? (
         <QueuePanel
           queue={queue}
-          currentIndex={currentIndex}
+          currentTrackId={currentTrackId}
           onSelect={playIndex}
           onRemove={removeFromQueue}
           onMove={reorderQueue}

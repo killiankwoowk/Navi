@@ -14,10 +14,19 @@ export const makeQueueItems = (tracks: Song[]): QueueItem[] =>
   }))
 
 export const reorderQueueItems = (queue: QueueItem[], fromIndex: number, toIndex: number): QueueItem[] => {
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= queue.length || toIndex >= queue.length) {
+    return queue
+  }
   const clone = [...queue]
   const [removed] = clone.splice(fromIndex, 1)
+  if (!removed) return queue
   clone.splice(toIndex, 0, removed)
   return clone
+}
+
+export const resolveCurrentIndex = (queue: QueueItem[], currentTrackId: string | null): number => {
+  if (!currentTrackId) return -1
+  return queue.findIndex((item) => item.track.id === currentTrackId)
 }
 
 export const buildShuffleOrder = (length: number, currentIndex: number): number[] => {

@@ -23,7 +23,16 @@ export const AddToPlaylistMenu = ({ songId }: AddToPlaylistMenuProps) => {
 
   return (
     <div className="relative">
-      <button className="terminal-button" onClick={() => setOpen((value) => !value)} type="button">
+      <button
+        className="terminal-button focus:outline-none focus:ring-2 focus:ring-terminal-green"
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          setOpen((value) => !value)
+        }}
+        type="button"
+        aria-label="Open add to playlist menu"
+      >
         [ +playlist ]
       </button>
       {open ? (
@@ -36,7 +45,11 @@ export const AddToPlaylistMenu = ({ songId }: AddToPlaylistMenuProps) => {
                 key={playlist.id}
                 className="block w-full border border-transparent px-2 py-1 text-left hover:border-terminal-accent hover:text-terminal-accent"
                 type="button"
-                onClick={() => addToPlaylist(playlist.id)}
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  void addToPlaylist(playlist.id)
+                }}
               >
                 {playlist.name}
               </button>

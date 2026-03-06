@@ -1,3 +1,4 @@
+import type { SleepTimerDefault } from '@/api/types'
 import { useEffect, useMemo, useState } from 'react'
 
 import { SLEEP_TIMER_OPTIONS } from '@/utils/constants'
@@ -5,6 +6,7 @@ import { SLEEP_TIMER_OPTIONS } from '@/utils/constants'
 interface SleepTimerControlProps {
   endsAt: number | null
   durationMinutes: number | null
+  defaultDuration?: SleepTimerDefault
   onSetTimer: (minutes: number) => void
   onCancel: () => void
 }
@@ -16,7 +18,13 @@ const formatRemaining = (ms: number): string => {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-export const SleepTimerControl = ({ endsAt, durationMinutes, onSetTimer, onCancel }: SleepTimerControlProps) => {
+export const SleepTimerControl = ({
+  endsAt,
+  durationMinutes,
+  defaultDuration = 'off',
+  onSetTimer,
+  onCancel,
+}: SleepTimerControlProps) => {
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
@@ -30,12 +38,23 @@ export const SleepTimerControl = ({ endsAt, durationMinutes, onSetTimer, onCance
     <div className="flex items-center gap-2 text-xs">
       <span className="text-terminal-muted">sleep</span>
       {SLEEP_TIMER_OPTIONS.map((minutes) => (
-        <button key={minutes} type="button" className="terminal-button px-1 py-0.5" onClick={() => onSetTimer(minutes)}>
+        <button
+          key={minutes}
+          type="button"
+          className={`terminal-button min-h-11 px-1 py-0.5 focus:outline-none focus:ring-2 focus:ring-terminal-green ${
+            defaultDuration === minutes ? 'border-terminal-accent text-terminal-accent' : ''
+          }`}
+          onClick={() => onSetTimer(minutes)}
+        >
           {minutes}
         </button>
       ))}
       {durationMinutes ? (
-        <button type="button" className="terminal-button px-1 py-0.5 text-terminal-warn" onClick={onCancel}>
+        <button
+          type="button"
+          className="terminal-button min-h-11 px-1 py-0.5 text-terminal-warn focus:outline-none focus:ring-2 focus:ring-terminal-green"
+          onClick={onCancel}
+        >
           cancel ({remaining})
         </button>
       ) : null}

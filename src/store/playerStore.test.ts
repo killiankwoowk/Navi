@@ -6,6 +6,7 @@ describe('playerStore sleep timer', () => {
   beforeEach(() => {
     usePlayerStore.setState({
       queue: [],
+      currentTrackId: null,
       currentIndex: -1,
       isPlaying: false,
       shuffle: false,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FixedSizeList as List, type ListChildComponentProps } from 'react-window'
 
@@ -63,24 +63,29 @@ export const HomeDashboard = () => {
   const [gridHeight, setGridHeight] = useState(() =>
     typeof window === 'undefined' ? 620 : Math.max(320, window.innerHeight - 400),
   )
-  const gridRef = useRef<HTMLDivElement | null>(null)
+  const [gridContainer, setGridContainer] = useState<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (!gridRef.current) return
+    const onResize = () => setGridHeight(Math.max(320, window.innerHeight - 400))
+    window.addEventListener('resize', onResize)
+
+    if (!gridContainer) {
+      return () => {
+        window.removeEventListener('resize', onResize)
+      }
+    }
 
     const observer = new ResizeObserver((entries) => {
       const nextWidth = Math.floor(entries[0]?.contentRect.width ?? 1000)
       if (nextWidth > 0) setGridWidth(nextWidth)
     })
-    observer.observe(gridRef.current)
+    observer.observe(gridContainer)
 
-    const onResize = () => setGridHeight(Math.max(320, window.innerHeight - 400))
-    window.addEventListener('resize', onResize)
     return () => {
       observer.disconnect()
       window.removeEventListener('resize', onResize)
     }
-  }, [])
+  }, [gridContainer])
 
   const coverUrlForAlbum = useCallback(
     (album: Album) => {
@@ -119,6 +124,7 @@ export const HomeDashboard = () => {
 
   const columns = Math.max(1, Math.floor(gridWidth / minColumnWidth))
   const rowCount = Math.ceil(mainFeed.length / columns)
+  const useVirtualizedGrid = mainFeed.length > 180
 
   return (
     <TerminalPanel title="Home Dashboard" className="space-y-3">
@@ -201,24 +207,43 @@ export const HomeDashboard = () => {
 
       <section className="space-y-2">
         <header className="text-xs uppercase tracking-[0.16em] text-terminal-muted">Main Feed Grid</header>
-        <div ref={gridRef} className="playlist-viewport">
-          <List
-            className="terminal-carousel"
-            width={gridWidth}
-            height={gridHeight}
-            itemCount={rowCount}
-            itemSize={rowHeight}
-            itemData={{
-              items: mainFeed,
-              columns,
-              coverUrlForAlbum,
-              playAlbum,
-              openAlbum,
-            }}
+        {useVirtualizedGrid ? (
+          <div ref={setGridContainer} className="playlist-viewport">
+            <List
+              className="terminal-carousel"
+              width={Math.max(gridWidth, 320)}
+              height={gridHeight}
+              itemCount={rowCount}
+              itemSize={rowHeight}
+              itemData={{
+                items: mainFeed,
+                columns,
+                coverUrlForAlbum,
+                playAlbum,
+                openAlbum,
+              }}
+              itemKey={(index, data) => data.items[index * data.columns]?.id ?? `main-feed-row-${index}`}
+            >
+              {GridRow}
+            </List>
+          </div>
+        ) : (
+          <div
+            ref={setGridContainer}
+            className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
           >
-            {GridRow}
-          </List>
-        </div>
+            {mainFeed.map((album) => (
+              <AlbumCard
+                key={`main-${album.id}`}
+                album={album}
+                coverUrl={coverUrlForAlbum(album)}
+                onPlay={() => playAlbum(album)}
+                onQueue={() => playAlbum(album, true)}
+                onOpen={() => openAlbum(album.id)}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </TerminalPanel>
   )

@@ -60,7 +60,9 @@ export const PlaylistView = ({
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className={`terminal-button px-2 py-0.5 ${viewMode === 'list' ? 'border-terminal-accent text-terminal-accent' : ''}`}
+            className={`terminal-button px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-terminal-green ${
+              viewMode === 'list' ? 'border-terminal-accent text-terminal-accent' : ''
+            }`}
             onClick={() => setViewMode('list')}
             aria-label="Show playlist in list view"
           >
@@ -68,7 +70,9 @@ export const PlaylistView = ({
           </button>
           <button
             type="button"
-            className={`terminal-button px-2 py-0.5 ${viewMode === 'grid' ? 'border-terminal-accent text-terminal-accent' : ''}`}
+            className={`terminal-button px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-terminal-green ${
+              viewMode === 'grid' ? 'border-terminal-accent text-terminal-accent' : ''
+            }`}
             onClick={() => setViewMode('grid')}
             aria-label="Show playlist in grid view"
           >

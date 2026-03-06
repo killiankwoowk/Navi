@@ -15,6 +15,8 @@ const PlaylistsPage = lazy(() => import('@/pages/PlaylistsPage').then((module) =
 const FavoritesPage = lazy(() => import('@/pages/Favorites').then((module) => ({ default: module.Favorites })))
 const MostPlayedPage = lazy(() => import('@/pages/MostPlayed').then((module) => ({ default: module.MostPlayed })))
 const RecentlyPlayedPage = lazy(() => import('@/pages/RecentlyPlayed').then((module) => ({ default: module.RecentlyPlayed })))
+const ProfilePage = lazy(() => import('@/pages/Profile').then((module) => ({ default: module.Profile })))
+const SettingsPage = lazy(() => import('@/pages/Settings').then((module) => ({ default: module.Settings })))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
 
 const PageLoader = () => (
@@ -99,6 +101,14 @@ export const router = createBrowserRouter([
       {
         path: '/playlists',
         element: <PlaylistsPage />,
+      },
+      {
+        path: '/profile',
+        element: <ProfilePage />,
+      },
+      {
+        path: '/settings',
+        element: <SettingsPage />,
       },
     ],
   },

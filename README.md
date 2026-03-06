@@ -25,6 +25,7 @@ Spotify-style Navidrome web frontend with a terminal/CLI visual theme.
 - Playlist list/grid toggle with virtualization
 - Lyrics panel with sync/follow controls and fallback sources
 - Favorites / Most Played / Recently Played pages
+- Profile and Settings pages (quality, sleep default, lyrics, theme/font, privacy import/export)
 - Audio quality control (`auto`, `low`, `medium`, `high`) via `maxBitRate`
 - Cover art via `getCoverArt.view`
 - Stream playback via `/rest/stream.view`
@@ -45,6 +46,8 @@ VITE_DEFAULT_NAVIDROME_URL=https://your-navidrome-host
 VITE_GENIUS_API_KEY=your_genius_api_key_here
 VITE_DEFAULT_AUDIO_QUALITY=auto
 ```
+
+Settings page also supports a local Genius key override (`Settings -> Lyrics`), stored in browser localStorage when entered.
 
 ## Quality checks
 
@@ -74,4 +77,5 @@ Additional E2E flow:
 
 ```bash
 pnpm test:e2e -- tests/e2e/playback.spec.ts
+pnpm test:e2e -- tests/e2e/album-navigation.spec.ts
 ```

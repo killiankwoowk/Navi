@@ -27,9 +27,10 @@ interface RowData {
   onRemoveTrack?: (track: Song, index: number) => void
 }
 
-const listItemSize = 86
-const gridItemHeight = 270
+const listItemSize = 96
+const gridItemHeight = 300
 const gridMinColumnWidth = 240
+const virtualizedThreshold = 200
 
 const PlaylistRow = ({ data, index, style }: ListChildComponentProps<RowData>) => {
   if (data.mode === 'list') {
@@ -59,7 +60,7 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps<RowData>) =
         const trackIndex = start + cellIndex
         return (
           <PlaylistCard
-            key={`${track.id}-${trackIndex}`}
+            key={track.id}
             track={track}
             mode="grid"
             coverUrl={data.resolveCoverUrl(track)}
@@ -86,6 +87,7 @@ export const PlaylistGrid = ({
 }: PlaylistGridProps) => {
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const [width, setWidth] = useState(900)
+  const useVirtualizedList = mode === 'grid' || tracks.length >= virtualizedThreshold
 
   useEffect(() => {
     if (!viewportRef.current) return
@@ -123,6 +125,25 @@ export const PlaylistGrid = ({
     [columns, mode, onOpenLyrics, onPlayTrack, onQueueTrack, onRemoveTrack, resolveCoverUrl, tracks],
   )
 
+  if (!useVirtualizedList && mode === 'list') {
+    return (
+      <div ref={viewportRef} className="playlist-viewport max-h-[65vh] space-y-1 overflow-auto p-1">
+        {tracks.map((track, index) => (
+          <PlaylistCard
+            key={track.id}
+            track={track}
+            mode="list"
+            coverUrl={resolveCoverUrl(track)}
+            onPlay={() => onPlayTrack(track, index)}
+            onQueue={() => onQueueTrack(track)}
+            onLyrics={() => onOpenLyrics(track)}
+            onRemove={onRemoveTrack ? () => onRemoveTrack(track, index) : undefined}
+          />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div ref={viewportRef} className="playlist-viewport h-full w-full">
       <List
@@ -132,6 +153,10 @@ export const PlaylistGrid = ({
         itemCount={itemCount}
         itemSize={itemSize}
         itemData={rowData}
+        itemKey={(index, data) => {
+          if (data.mode === 'list') return data.tracks[index]?.id ?? `row-${index}`
+          return data.tracks[index * data.columns]?.id ?? `row-${index}`
+        }}
       >
         {PlaylistRow}
       </List>

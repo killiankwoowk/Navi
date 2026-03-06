@@ -93,6 +93,9 @@ export interface Search3Result {
 export type RepeatMode = 'off' | 'all' | 'one'
 export type AudioQuality = 'auto' | 'low' | 'medium' | 'high'
 export type LyricsSource = 'auto' | 'genius' | 'local'
+export type ThemeMode = 'terminal-dark' | 'terminal-contrast'
+export type FontMode = 'jetbrains' | 'fira'
+export type SleepTimerDefault = 'off' | 15 | 30 | 60
 
 export interface LyricsEntry {
   time: number
@@ -117,6 +120,7 @@ export interface SleepTimerState {
 
 export interface PlayerState {
   queue: QueueItem[]
+  currentTrackId: string | null
   currentIndex: number
   isPlaying: boolean
   shuffle: boolean

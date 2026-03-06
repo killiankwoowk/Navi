@@ -64,3 +64,23 @@
   color: #00e5ff;
   text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
 }
+
+:root[data-theme-mode='terminal-contrast'] body {
+  background: radial-gradient(circle at top left, #0d1f1a 0%, #010201 38%, #000 100%);
+}
+
+:root[data-theme-mode='terminal-contrast'] .terminal-panel,
+:root[data-theme-mode='terminal-contrast'] .terminal-card {
+  border-color: rgba(57, 255, 177, 0.65);
+}
+
+:root[data-theme-mode='terminal-contrast'] .terminal-button,
+:root[data-theme-mode='terminal-contrast'] .terminal-input {
+  border-color: rgba(57, 255, 177, 0.75);
+  color: #39ffb1;
+}
+
+:root[data-theme-mode='terminal-contrast'] .terminal-heading,
+:root[data-theme-mode='terminal-contrast'] .text-terminal-muted {
+  color: #b8c1c8 !important;
+}

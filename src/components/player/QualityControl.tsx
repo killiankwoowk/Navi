@@ -19,7 +19,7 @@ export const QualityControl = ({ value, onChange, compact }: QualityControlProps
       <select
         value={value}
         onChange={(event) => onChange(event.target.value as AudioQuality)}
-        className="h-7 border border-terminal-text/35 bg-black/40 px-2 text-[11px] uppercase tracking-[0.12em] text-terminal-text"
+        className="h-11 border border-terminal-text/35 bg-black/40 px-2 text-[11px] uppercase tracking-[0.12em] text-terminal-text focus:outline-none focus:ring-2 focus:ring-terminal-green"
         aria-label="Audio quality"
       >
         {QUALITY_OPTIONS.map((option) => (
@@ -38,7 +38,7 @@ export const QualityControl = ({ value, onChange, compact }: QualityControlProps
         <button
           key={option.value}
           type="button"
-          className={`terminal-button px-1 py-0.5 ${
+          className={`terminal-button min-h-11 px-1 py-0.5 focus:outline-none focus:ring-2 focus:ring-terminal-green ${
             option.value === value ? 'border-terminal-accent text-terminal-accent' : ''
           }`}
           onClick={() => onChange(option.value)}

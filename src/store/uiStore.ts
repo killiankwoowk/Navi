@@ -10,6 +10,7 @@ interface UiStore {
   playlistViewMode: 'list' | 'grid'
   lyricsPanelOpen: boolean
   lyricsTargetSong: Song | null
+  streamQualityWarning: string | null
   setQueuePanelOpen: (value: boolean) => void
   toggleQueuePanel: () => void
   setCompactMode: (value: boolean) => void
@@ -17,6 +18,7 @@ interface UiStore {
   setPlaylistViewMode: (mode: 'list' | 'grid') => void
   openLyricsPanel: (song?: Song | null) => void
   closeLyricsPanel: () => void
+  setStreamQualityWarning: (message: string | null) => void
 }
 
 export const useUiStore = create<UiStore>()(
@@ -28,6 +30,7 @@ export const useUiStore = create<UiStore>()(
       playlistViewMode: 'list',
       lyricsPanelOpen: false,
       lyricsTargetSong: null,
+      streamQualityWarning: null,
       setQueuePanelOpen: (value) => set({ queuePanelOpen: value }),
       toggleQueuePanel: () => set((state) => ({ queuePanelOpen: !state.queuePanelOpen })),
       setCompactMode: (value) => set({ compactMode: value }),
@@ -35,6 +38,7 @@ export const useUiStore = create<UiStore>()(
       setPlaylistViewMode: (playlistViewMode) => set({ playlistViewMode }),
       openLyricsPanel: (song) => set({ lyricsPanelOpen: true, lyricsTargetSong: song ?? null }),
       closeLyricsPanel: () => set({ lyricsPanelOpen: false, lyricsTargetSong: null }),
+      setStreamQualityWarning: (streamQualityWarning) => set({ streamQualityWarning }),
     }),
     {
       name: 'navi-ui',

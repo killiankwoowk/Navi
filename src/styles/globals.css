@@ -12,6 +12,22 @@
   --accent: #00e5ff;
 }
 
+:root[data-theme-mode='terminal-contrast'] {
+  --bg: #010201;
+  --panel: #060d09;
+  --text-primary: #39ffb1;
+  --text-secondary: #b8c1c8;
+  --accent: #34f8ff;
+}
+
+:root[data-font-mode='fira'] {
+  font-family: 'Fira Code', 'JetBrains Mono', 'Source Code Pro', monospace;
+}
+
+:root[data-font-mode='jetbrains'] {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: #00ff9c22 transparent;

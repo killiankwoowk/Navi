@@ -39,11 +39,11 @@
 }
 
 .terminal-button {
-  @apply inline-flex items-center gap-2 border border-terminal-text/45 bg-transparent px-2 py-1 text-xs uppercase tracking-[0.15em] text-terminal-text transition-colors duration-fast hover:border-terminal-accent hover:text-terminal-accent disabled:cursor-not-allowed disabled:opacity-40;
+  @apply inline-flex items-center gap-2 border border-terminal-text/45 bg-transparent px-2 py-1 text-xs uppercase tracking-[0.15em] text-terminal-text transition-colors duration-fast hover:border-terminal-accent hover:text-terminal-accent focus:outline-none focus:ring-2 focus:ring-terminal-green disabled:cursor-not-allowed disabled:opacity-40;
 }
 
 .terminal-input {
-  @apply w-full border border-terminal-text/35 bg-black/30 px-3 py-2 text-sm text-terminal-text outline-none transition-colors duration-fast placeholder:text-terminal-muted/70 focus:border-terminal-accent;
+  @apply w-full border border-terminal-text/35 bg-black/30 px-3 py-2 text-sm text-terminal-text outline-none transition-colors duration-fast placeholder:text-terminal-muted/70 focus:border-terminal-accent focus:ring-2 focus:ring-terminal-green;
 }
 
 .cursor-blink::after {

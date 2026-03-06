@@ -4,11 +4,9 @@ import { useNavigate } from 'react-router-dom'
 
 import { AsciiLogo } from '@/components/common/AsciiLogo'
 import { useAuth } from '@/features/auth/useAuth'
-import { useUiStore } from '@/store/uiStore'
 
 export const TopBar = () => {
   const navigate = useNavigate()
-  const toggleQueue = useUiStore((state) => state.toggleQueuePanel)
   const { logout } = useAuth()
   const [searchInput, setSearchInput] = useState('')
 
@@ -32,16 +30,23 @@ export const TopBar = () => {
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               placeholder="search artists albums songs"
+              aria-label="Global search"
             />
             <button className="terminal-button h-9" type="submit">
               run
             </button>
           </form>
-          <button className="terminal-button h-9" onClick={toggleQueue} type="button">
-            queue
+          <button className="terminal-button h-9" onClick={() => navigate('/profile')} type="button">
+            profile
+          </button>
+          <button className="terminal-button h-9" onClick={() => navigate('/settings')} type="button">
+            settings
           </button>
           <button className="terminal-button h-9" onClick={logout} type="button">
             logout
+          </button>
+          <button className="terminal-button h-9 md:hidden" onClick={() => navigate('/playlists')} type="button">
+            queue
           </button>
         </div>
       </div>

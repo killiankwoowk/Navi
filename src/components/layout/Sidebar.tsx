@@ -8,6 +8,8 @@ const links = [
   { to: '/artists', label: '> Artists' },
   { to: '/search', label: '> Search' },
   { to: '/playlists', label: '> Playlists' },
+  { to: '/profile', label: '> Profile' },
+  { to: '/settings', label: '> Settings' },
 ]
 
 export const Sidebar = () => (
@@ -19,7 +21,7 @@ export const Sidebar = () => (
           key={link.to}
           to={link.to}
           className={({ isActive }) =>
-            `block border px-2 py-2 transition-colors duration-fast ${
+            `block border px-2 py-2 transition-colors duration-fast focus:outline-none focus:ring-2 focus:ring-terminal-green ${
               isActive
                 ? 'border-terminal-accent bg-terminal-accent/10 text-terminal-accent'
                 : 'border-terminal-text/15 text-terminal-muted hover:border-terminal-text/45 hover:text-terminal-text'

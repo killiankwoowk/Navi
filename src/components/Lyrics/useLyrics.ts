@@ -82,15 +82,17 @@ const fetchGeniusLyrics = async (song: Song, apiKey: string): Promise<string | n
 export const useLyrics = (song: Song | null) => {
   const lyricsEnabled = useSettingsStore((state) => state.lyricsEnabled)
   const lyricsSource = useSettingsStore((state) => state.lyricsSource)
+  const geniusApiKeyOverride = useSettingsStore((state) => state.geniusApiKeyOverride)
 
   const query = useQuery({
-    queryKey: ['lyrics', song?.id, lyricsSource],
+    queryKey: ['lyrics', song?.id, lyricsSource, geniusApiKeyOverride],
     enabled: Boolean(song?.id) && lyricsEnabled,
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<LyricsState> => {
       if (!song) return emptyState
 
-      const geniusApiKey = (import.meta.env.VITE_GENIUS_API_KEY as string | undefined)?.trim()
+      const geniusApiKey =
+        geniusApiKeyOverride.trim() || ((import.meta.env.VITE_GENIUS_API_KEY as string | undefined)?.trim() ?? '')
       const client = getNavidromeClientOrNull()
 
       if (lyricsSource !== 'local' && geniusApiKey) {
