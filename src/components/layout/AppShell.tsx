@@ -54,7 +54,7 @@ export const AppShell = () => {
   }, [mobilePlayerExpanded, setMobilePlayerExpanded, viewportMode])
 
   return (
-    <div className="terminal-grid min-h-screen pb-32 md:pb-36">
+    <div className="terminal-grid min-h-screen pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-40 lg:pb-32">
       <TopBar />
       <ResponsiveLayout
         viewportMode={viewportMode}

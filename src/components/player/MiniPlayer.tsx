@@ -12,7 +12,7 @@ interface MiniPlayerProps {
 }
 
 export const MiniPlayer = ({ track, isPlaying, queueCount, onTogglePlay, onExpand, onOpenQueue }: MiniPlayerProps) => (
-  <div className="terminal-panel fixed bottom-[4.3rem] left-0 right-0 z-30 mx-2 px-3 py-2 md:hidden">
+  <div className="terminal-panel fixed bottom-[calc(4.3rem+env(safe-area-inset-bottom))] left-0 right-0 z-30 mx-2 px-3 py-2 md:hidden">
     <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2">
       <button
         type="button"

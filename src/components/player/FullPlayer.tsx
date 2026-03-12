@@ -1,11 +1,10 @@
 import { useRef } from 'react'
 import { ChevronDown, ListMusic, MessageSquareText } from 'lucide-react'
 
-import type { AudioQuality, RepeatMode, Song } from '@/api/types'
+import type { RepeatMode, Song } from '@/api/types'
 
 import { CoverArtImage } from '@/components/common/CoverArtImage'
 import { ProgressBar } from '@/components/player/ProgressBar'
-import { QualityControl } from '@/components/player/QualityControl'
 import { TransportControls } from '@/components/player/TransportControls'
 
 interface FullPlayerProps {
@@ -17,7 +16,6 @@ interface FullPlayerProps {
   repeat: RepeatMode
   progress: number
   duration: number
-  audioQuality: AudioQuality
   queueCount: number
   onClose: () => void
   onTogglePlay: () => void
@@ -28,7 +26,6 @@ interface FullPlayerProps {
   onSeek: (value: number) => void
   onToggleLyrics: () => void
   onOpenQueue: () => void
-  onQualityChange: (quality: AudioQuality) => void
 }
 
 export const FullPlayer = ({
@@ -40,7 +37,6 @@ export const FullPlayer = ({
   repeat,
   progress,
   duration,
-  audioQuality,
   queueCount,
   onClose,
   onTogglePlay,
@@ -51,7 +47,6 @@ export const FullPlayer = ({
   onSeek,
   onToggleLyrics,
   onOpenQueue,
-  onQualityChange,
 }: FullPlayerProps) => {
   const touchStartYRef = useRef<number | null>(null)
 
@@ -111,7 +106,6 @@ export const FullPlayer = ({
               <ListMusic size={14} />
               queue [{queueCount}]
             </button>
-            <QualityControl value={audioQuality} onChange={onQualityChange} compact />
           </div>
         </div>
       </div>

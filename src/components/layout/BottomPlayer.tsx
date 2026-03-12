@@ -44,7 +44,6 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   const checkSleepTimer = usePlayerStore((state) => state.checkSleepTimer)
   const incrementPlay = useUsageStore((state) => state.incrementPlay)
   const audioQuality = useSettingsStore((state) => state.audioQuality)
-  const setAudioQuality = useSettingsStore((state) => state.setAudioQuality)
   const defaultSleepTimer = useSettingsStore((state) => state.defaultSleepTimer)
 
   const lyricsPanelOpen = useUiStore((state) => state.lyricsPanelOpen)
@@ -191,7 +190,6 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
             repeat={repeat}
             progress={progress}
             duration={duration}
-            audioQuality={audioQuality}
             queueCount={queue.length}
             onClose={() => setMobilePlayerExpanded(false)}
             onTogglePlay={togglePlay}
@@ -208,7 +206,6 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
             }}
             onToggleLyrics={handleToggleLyrics}
             onOpenQueue={handleToggleQueue}
-            onQualityChange={setAudioQuality}
           />
         </>
       ) : (
@@ -223,7 +220,6 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
           progress={progress}
           duration={duration}
           volume={volume}
-          audioQuality={audioQuality}
           defaultSleepTimer={defaultSleepTimer}
           queueActive={!desktopQueueCollapsed}
           lyricsActive={lyricsPanelOpen}
@@ -240,7 +236,6 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
             setProgress(value)
           }}
           onVolumeChange={setVolume}
-          onQualityChange={setAudioQuality}
           onSetSleepTimer={setSleepTimer}
           onCancelSleepTimer={clearSleepTimer}
           sleepEndsAt={sleepTimer.endsAt}

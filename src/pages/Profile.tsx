@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import type { UsageEntry } from '@/api/types'
 import { TerminalPanel } from '@/components/common/TerminalPanel'
 import { useAuth } from '@/features/auth/useAuth'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
@@ -26,6 +27,20 @@ const colorFromName = (name: string): string => {
   return `hsl(${Math.abs(hash % 360)}, 70%, 25%)`
 }
 
+const getTopArtists = (entries: Record<string, UsageEntry>, limit: number) => {
+  const artistMap = new Map<string, number>()
+
+  for (const entry of Object.values(entries)) {
+    const artist = entry.song.artist?.trim() || 'Unknown artist'
+    artistMap.set(artist, (artistMap.get(artist) ?? 0) + entry.playCount)
+  }
+
+  return Array.from(artistMap.entries())
+    .map(([artist, playCount]) => ({ artist, playCount }))
+    .sort((a, b) => b.playCount - a.playCount)
+    .slice(0, limit)
+}
+
 export const Profile = () => {
   useDocumentTitle('Profile | Navi Terminal Player')
 
@@ -36,10 +51,14 @@ export const Profile = () => {
   const serverUrl = useAuthStore((state) => state.serverUrl)
   const clearGeniusApiKey = useSettingsStore((state) => state.clearGeniusApiKey)
   const geniusApiKeyOverride = useSettingsStore((state) => state.geniusApiKeyOverride)
+  const usageEntries = useUsageStore((state) => state.entries)
 
-  const totalPlays = useUsageStore((state) => state.getTotalPlays())
-  const topArtists = useUsageStore((state) => state.getTopArtists(6))
-  const trackedSongs = useUsageStore((state) => Object.keys(state.entries).length)
+  const totalPlays = useMemo(
+    () => Object.values(usageEntries).reduce((sum, entry) => sum + entry.playCount, 0),
+    [usageEntries],
+  )
+  const topArtists = useMemo(() => getTopArtists(usageEntries, 6), [usageEntries])
+  const trackedSongs = useMemo(() => Object.keys(usageEntries).length, [usageEntries])
 
   const avatarInitials = useMemo(() => initialsFromName(username || 'Navi User'), [username])
   const avatarColor = useMemo(() => colorFromName(username || 'Navi User'), [username])

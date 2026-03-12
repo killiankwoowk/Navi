@@ -4,7 +4,7 @@ interface VolumeControlProps {
 }
 
 export const VolumeControl = ({ volume, onChange }: VolumeControlProps) => (
-  <div className="grid w-32 grid-cols-[auto_1fr] items-center gap-2 text-xs md:w-36">
+  <div className="grid w-full max-w-[11rem] grid-cols-[auto_1fr] items-center gap-2 text-xs sm:w-36">
     <span className="text-terminal-muted">vol</span>
     <input
       type="range"

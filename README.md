@@ -43,7 +43,7 @@ You can override it with:
 ```bash
 # .env.local
 VITE_DEFAULT_NAVIDROME_URL=https://your-navidrome-host
-VITE_GENIUS_API_KEY=your_genius_api_key_here
+VITE_GENIUS_API_KEY=    
 VITE_DEFAULT_AUDIO_QUALITY=auto
 ```
 
