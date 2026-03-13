@@ -36,10 +36,16 @@ describe('BottomPlayer responsive modes', () => {
       themeMode: 'terminal-dark',
       fontMode: 'jetbrains',
       analyticsEnabled: false,
+      lastfmEnabled: false,
+      lastfmApiKey: '',
+      lastfmApiSecret: '',
+      lastfmUsername: '',
+      lastfmSessionKey: '',
     })
     useUiStore.setState({
       mobilePlayerExpanded: false,
       mobileQueueOpen: false,
+      mobileSidebarOpen: false,
       desktopQueueCollapsed: false,
       lyricsPanelOpen: false,
       lyricsTargetSong: null,
@@ -68,4 +74,3 @@ describe('BottomPlayer responsive modes', () => {
     expect(screen.getByLabelText('Toggle queue panel')).toBeInTheDocument()
   })
 })
-

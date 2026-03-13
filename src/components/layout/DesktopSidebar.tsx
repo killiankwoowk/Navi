@@ -9,9 +9,9 @@ interface DesktopSidebarProps {
 }
 
 export const DesktopSidebar = ({ collapsed, onToggleCollapsed }: DesktopSidebarProps) => (
-  <aside className="terminal-panel h-full min-h-0">
+  <aside className="terminal-panel h-full min-h-0 overflow-hidden">
     <div className="terminal-heading flex items-center justify-between">
-      <span># Nav</span>
+      <span>{collapsed ? '#' : '# Nav'}</span>
       <button
         type="button"
         className="terminal-button min-h-11 px-2 py-1"
@@ -21,7 +21,7 @@ export const DesktopSidebar = ({ collapsed, onToggleCollapsed }: DesktopSidebarP
         {collapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
       </button>
     </div>
-    <nav className="space-y-1 p-2 text-xs uppercase tracking-[0.15em]">
+    <nav className={`space-y-1 p-2 text-xs uppercase tracking-[0.15em] ${collapsed ? 'px-1' : ''}`}>
       {desktopNavItems.map((item) => (
         <NavLink
           key={item.to}
@@ -31,7 +31,7 @@ export const DesktopSidebar = ({ collapsed, onToggleCollapsed }: DesktopSidebarP
               isActive
                 ? 'border-terminal-accent bg-terminal-accent/10 text-terminal-accent'
                 : 'border-terminal-text/15 text-terminal-muted hover:border-terminal-text/45 hover:text-terminal-text'
-            }`
+            } ${collapsed ? 'justify-center px-1' : ''}`
           }
           aria-label={item.label}
         >
@@ -42,4 +42,3 @@ export const DesktopSidebar = ({ collapsed, onToggleCollapsed }: DesktopSidebarP
     </nav>
   </aside>
 )
-

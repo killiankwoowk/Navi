@@ -1,6 +1,7 @@
-import { useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import { DragHandle } from '@/components/common/DragHandle'
+import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { usePlayerStore } from '@/store/playerStore'
 
@@ -17,6 +18,9 @@ export const QueueDrawer = ({ open, onClose }: QueueDrawerProps) => {
   const playIndex = usePlayerStore((state) => state.playIndex)
   const removeFromQueue = usePlayerStore((state) => state.removeFromQueue)
   const reorderQueue = usePlayerStore((state) => state.reorderQueue)
+  const clearQueue = usePlayerStore((state) => state.clearQueue)
+  const [isSaving, setIsSaving] = useState(false)
+  const client = useMemo(() => getNavidromeClientOrNull(), [])
 
   const panelRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -28,6 +32,24 @@ export const QueueDrawer = ({ open, onClose }: QueueDrawerProps) => {
     initialFocusRef: closeButtonRef,
     onClose,
   })
+
+  const handleSaveQueue = async () => {
+    if (!queue.length || !client) return
+    const name = window.prompt('Playlist name for current queue?')
+    if (!name) return
+    setIsSaving(true)
+    try {
+      await client.createPlaylist(name, queue.map((item) => item.track.id))
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleClearQueue = () => {
+    if (!queue.length) return
+    if (!window.confirm('Are you sure you want to clear the queue?')) return
+    clearQueue()
+  }
 
   if (!open) return null
 
@@ -51,17 +73,37 @@ export const QueueDrawer = ({ open, onClose }: QueueDrawerProps) => {
         <DragHandle />
         <div className="terminal-heading flex items-center justify-between">
           <span>| Queue [{queue.length}]</span>
-          <button
-            ref={closeButtonRef}
-            className="terminal-button min-h-11 px-2 py-1"
-            type="button"
-            onClick={onClose}
-            aria-label="Close queue drawer"
-          >
-            close
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="terminal-button min-h-11 px-2 py-1"
+              onClick={handleSaveQueue}
+              disabled={!queue.length || isSaving}
+              aria-label="Save queue as playlist"
+            >
+              {isSaving ? 'saving...' : 'save queue'}
+            </button>
+            <button
+              type="button"
+              className="terminal-button min-h-11 px-2 py-1"
+              onClick={handleClearQueue}
+              disabled={!queue.length}
+              aria-label="Clear queue"
+            >
+              clear
+            </button>
+            <button
+              ref={closeButtonRef}
+              className="terminal-button min-h-11 px-2 py-1"
+              type="button"
+              onClick={onClose}
+              aria-label="Close queue drawer"
+            >
+              close
+            </button>
+          </div>
         </div>
-        <div className="overflow-auto p-2">
+        <div className="overflow-auto p-2 pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
           <QueueList
             queue={queue}
             currentTrackId={currentTrackId}

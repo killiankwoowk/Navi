@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef } from 'react'
 
-import type { ViewportMode } from '@/api/types'
+import type { Song, ViewportMode } from '@/api/types'
 import { LyricsPanel } from '@/components/Lyrics/LyricsPanel'
 import { DesktopPlayerBar } from '@/components/player/DesktopPlayerBar'
 import { FullPlayer } from '@/components/player/FullPlayer'
 import { MiniPlayer } from '@/components/player/MiniPlayer'
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { audioEngine } from '@/player/audioEngine'
+import { createScrobbleController } from '@/player/PlayerController'
 import { getCurrentQueueItem } from '@/player/playback'
+import { createLastfmClient } from '@/services/lastfmService'
 import { usePlayerStore } from '@/store/playerStore'
 import { useSettingsStore } from '@/store/settingsStore'
 import { useUiStore } from '@/store/uiStore'
@@ -45,6 +47,11 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   const incrementPlay = useUsageStore((state) => state.incrementPlay)
   const audioQuality = useSettingsStore((state) => state.audioQuality)
   const defaultSleepTimer = useSettingsStore((state) => state.defaultSleepTimer)
+  const lastfmEnabled = useSettingsStore((state) => state.lastfmEnabled)
+  const lastfmApiKey = useSettingsStore((state) => state.lastfmApiKey)
+  const lastfmApiSecret = useSettingsStore((state) => state.lastfmApiSecret)
+  const lastfmUsername = useSettingsStore((state) => state.lastfmUsername)
+  const lastfmSessionKey = useSettingsStore((state) => state.lastfmSessionKey)
 
   const lyricsPanelOpen = useUiStore((state) => state.lyricsPanelOpen)
   const lyricsTargetSong = useUiStore((state) => state.lyricsTargetSong)
@@ -64,6 +71,12 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   const maxBitRate = useMemo(() => getMaxBitRateForQuality(audioQuality), [audioQuality])
   const lastTrackedSongIdRef = useRef<string | null>(null)
   const warnedBitrateProbeRef = useRef<Set<string>>(new Set())
+  const scrobbleControllerRef = useRef(
+    createScrobbleController({
+      nowPlaying: async () => {},
+      submit: async () => {},
+    }),
+  )
   const lyricsSong = lyricsTargetSong ?? currentItem?.track ?? null
 
   const coverUrl = useMemo(() => {
@@ -76,6 +89,73 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   useEffect(() => {
     audioEngine.setVolume(volume)
   }, [volume])
+
+  const lastfmClient = useMemo(() => {
+    if (!lastfmEnabled || !lastfmApiKey || !lastfmApiSecret || !lastfmSessionKey) return null
+    return createLastfmClient({
+      apiKey: lastfmApiKey,
+      apiSecret: lastfmApiSecret,
+      sessionKey: lastfmSessionKey,
+      username: lastfmUsername,
+    })
+  }, [lastfmApiKey, lastfmApiSecret, lastfmEnabled, lastfmSessionKey, lastfmUsername])
+
+  const scrobbleClient = useMemo(
+    () => ({
+      nowPlaying: async (track: Song) => {
+        if (client) {
+          await client.scrobble(track.id, false).catch(() => null)
+        }
+        if (lastfmClient && track.artist && track.title) {
+          await lastfmClient
+            .updateNowPlaying({
+              artist: track.artist,
+              track: track.title,
+              album: track.album,
+              duration: track.duration,
+            })
+            .catch(() => null)
+        }
+      },
+      submit: async (track: Song, startedAt: number) => {
+        if (client) {
+          await client.scrobble(track.id, true).catch(() => null)
+        }
+        if (lastfmClient && track.artist && track.title) {
+          await lastfmClient
+            .scrobble({
+              artist: track.artist,
+              track: track.title,
+              album: track.album,
+              duration: track.duration,
+              timestamp: Math.floor(startedAt / 1000),
+            })
+            .catch(() => null)
+        }
+      },
+    }),
+    [client, lastfmClient],
+  )
+
+  useEffect(() => {
+    scrobbleControllerRef.current.setClient(scrobbleClient)
+  }, [scrobbleClient])
+
+  const currentTrackKey = currentItem?.track.id ?? null
+
+  useEffect(() => {
+    scrobbleControllerRef.current.setTrack(currentItem?.track ?? null)
+  }, [currentItem?.track, currentTrackKey])
+
+  useEffect(() => {
+    if (!currentTrackKey || !isPlaying) return
+    scrobbleControllerRef.current.onPlay()
+  }, [currentTrackKey, isPlaying])
+
+  useEffect(() => {
+    if (!currentTrackKey) return
+    scrobbleControllerRef.current.onProgress(progress, duration)
+  }, [currentTrackKey, duration, progress])
 
   useEffect(() => {
     if (!currentItem || !client) {
@@ -135,7 +215,10 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   useEffect(() => {
     const offTimeUpdate = audioEngine.on('timeupdate', () => setProgress(audioEngine.element.currentTime))
     const offLoaded = audioEngine.on('loadedmetadata', () => setDuration(audioEngine.element.duration || 0))
-    const offEnded = audioEngine.on('ended', () => next())
+    const offEnded = audioEngine.on('ended', () => {
+      scrobbleControllerRef.current.onEnded()
+      next()
+    })
     const offError = audioEngine.on('error', () => setPlaying(false))
 
     return () => {

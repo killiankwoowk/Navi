@@ -13,6 +13,7 @@ interface UiStore {
   streamQualityWarning: string | null
   desktopSidebarCollapsed: boolean
   desktopQueueCollapsed: boolean
+  mobileSidebarOpen: boolean
   mobilePlayerExpanded: boolean
   mobileQueueOpen: boolean
   mobileSearchTab: 'songs' | 'albums' | 'artists'
@@ -26,6 +27,10 @@ interface UiStore {
   setStreamQualityWarning: (message: string | null) => void
   setDesktopSidebarCollapsed: (value: boolean) => void
   setDesktopQueueCollapsed: (value: boolean) => void
+  setMobileSidebarOpen: (value: boolean) => void
+  openSidebar: () => void
+  closeSidebar: () => void
+  toggleSidebar: () => void
   setMobilePlayerExpanded: (value: boolean) => void
   setMobileQueueOpen: (value: boolean) => void
   setMobileSearchTab: (value: 'songs' | 'albums' | 'artists') => void
@@ -43,6 +48,7 @@ export const useUiStore = create<UiStore>()(
       streamQualityWarning: null,
       desktopSidebarCollapsed: false,
       desktopQueueCollapsed: false,
+      mobileSidebarOpen: false,
       mobilePlayerExpanded: false,
       mobileQueueOpen: false,
       mobileSearchTab: 'songs',
@@ -56,6 +62,10 @@ export const useUiStore = create<UiStore>()(
       setStreamQualityWarning: (streamQualityWarning) => set({ streamQualityWarning }),
       setDesktopSidebarCollapsed: (desktopSidebarCollapsed) => set({ desktopSidebarCollapsed }),
       setDesktopQueueCollapsed: (desktopQueueCollapsed) => set({ desktopQueueCollapsed }),
+      setMobileSidebarOpen: (mobileSidebarOpen) => set({ mobileSidebarOpen }),
+      openSidebar: () => set({ mobileSidebarOpen: true }),
+      closeSidebar: () => set({ mobileSidebarOpen: false }),
+      toggleSidebar: () => set((state) => ({ mobileSidebarOpen: !state.mobileSidebarOpen })),
       setMobilePlayerExpanded: (mobilePlayerExpanded) => set({ mobilePlayerExpanded }),
       setMobileQueueOpen: (mobileQueueOpen) => set({ mobileQueueOpen }),
       setMobileSearchTab: (mobileSearchTab) => set({ mobileSearchTab }),

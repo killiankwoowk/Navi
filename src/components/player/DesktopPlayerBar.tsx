@@ -67,7 +67,7 @@ export const DesktopPlayerBar = ({
   onToggleQueue,
   warningMessage,
 }: DesktopPlayerBarProps) => (
-  <footer className="terminal-panel sticky bottom-0 z-20 mx-2 mb-2 mt-2 p-2 sm:mx-3 sm:mb-3 sm:p-3">
+  <footer className="terminal-panel fixed bottom-0 left-0 right-0 z-30 mx-2 mb-2 p-2 sm:mx-3 sm:mb-3 sm:p-3">
     <div className="grid gap-3 xl:grid-cols-[minmax(220px,1.05fr)_minmax(0,1.8fr)_minmax(240px,0.95fr)] xl:items-center">
       <NowPlaying track={track} coverUrl={coverUrl} />
       <div className="min-w-0 space-y-2">
@@ -102,7 +102,6 @@ export const DesktopPlayerBar = ({
               queue
               <span className="rounded-sm border border-terminal-text/40 px-1 text-[10px]">{queueLength}</span>
             </button>
-            <VolumeControl volume={volume} onChange={onVolumeChange} />
           </div>
         </div>
         <ProgressBar progress={progress} duration={duration} onSeek={onSeek} />

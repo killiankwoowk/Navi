@@ -13,6 +13,11 @@ describe('stream quality settings', () => {
       lyricsFontSize: 16,
       lyricsSyncOffsetMs: 0,
       lyricsFollowMode: true,
+      lastfmEnabled: false,
+      lastfmApiKey: '',
+      lastfmApiSecret: '',
+      lastfmUsername: '',
+      lastfmSessionKey: '',
     })
   })
 

@@ -5,40 +5,48 @@ import type { ViewportMode } from '@/api/types'
 interface ResponsiveLayoutProps extends PropsWithChildren {
   viewportMode: ViewportMode
   desktopSidebar: ReactNode
-  tabletSidebar: ReactNode
+  desktopSidebarCollapsed?: boolean
   queueDock?: ReactNode
 }
 
 export const ResponsiveLayout = ({
   viewportMode,
   desktopSidebar,
-  tabletSidebar,
+  desktopSidebarCollapsed = false,
   queueDock,
   children,
 }: ResponsiveLayoutProps) => {
   if (viewportMode === 'mobile') {
-    return <div className="space-y-3 px-2 py-2 pb-28">{children}</div>
+    return (
+      <main className="flex-1 min-h-0 overflow-auto px-2 py-2 pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
+        <div className="space-y-3">{children}</div>
+      </main>
+    )
   }
 
   if (viewportMode === 'tablet') {
     return (
-      <div className="grid min-h-[calc(100vh-250px)] grid-cols-[72px_1fr] gap-3 px-3 py-3">
-        {tabletSidebar}
-        <main className="min-h-0 space-y-3">{children}</main>
-      </div>
+      <main className="flex-1 min-h-0 overflow-auto px-3 py-3 pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
+        <div className="space-y-3">{children}</div>
+      </main>
     )
   }
 
+  const gridCols = queueDock
+    ? desktopSidebarCollapsed
+      ? 'grid-cols-[72px_minmax(0,1fr)_340px]'
+      : 'grid-cols-[260px_minmax(0,1fr)_340px]'
+    : desktopSidebarCollapsed
+      ? 'grid-cols-[72px_minmax(0,1fr)]'
+      : 'grid-cols-[260px_minmax(0,1fr)]'
+
   return (
-    <div
-      className={`grid min-h-[calc(100vh-250px)] gap-3 px-3 py-3 ${
-        queueDock ? 'grid-cols-[260px_minmax(0,1fr)_340px]' : 'grid-cols-[260px_minmax(0,1fr)]'
-      }`}
-    >
+    <div className={`grid h-full min-h-0 gap-3 px-3 py-3 ${gridCols}`}>
       {desktopSidebar}
-      <main className="min-h-0 space-y-3">{children}</main>
+      <main className="min-h-0 overflow-auto pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
+        <div className="space-y-3">{children}</div>
+      </main>
       {queueDock}
     </div>
   )
 }
-

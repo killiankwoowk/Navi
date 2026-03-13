@@ -11,7 +11,7 @@ import { BottomPlayer } from './BottomPlayer'
 import { DesktopSidebar } from './DesktopSidebar'
 import { MobileNavBar } from './MobileNavBar'
 import { ResponsiveLayout } from './ResponsiveLayout'
-import { TabletSidebarRail } from './TabletSidebarRail'
+import { SidebarDrawer } from './SidebarDrawer'
 import { TopBar } from './TopBar'
 import { QueueDock } from '@/components/player/QueueDock'
 import { QueueDrawer } from '@/components/player/QueueDrawer'
@@ -28,6 +28,8 @@ export const AppShell = () => {
   const setDesktopSidebarCollapsed = useUiStore((state) => state.setDesktopSidebarCollapsed)
   const desktopQueueCollapsed = useUiStore((state) => state.desktopQueueCollapsed)
   const setDesktopQueueCollapsed = useUiStore((state) => state.setDesktopQueueCollapsed)
+  const mobileSidebarOpen = useUiStore((state) => state.mobileSidebarOpen)
+  const setMobileSidebarOpen = useUiStore((state) => state.setMobileSidebarOpen)
   const mobileQueueOpen = useUiStore((state) => state.mobileQueueOpen)
   const setMobileQueueOpen = useUiStore((state) => state.setMobileQueueOpen)
   const mobilePlayerExpanded = useUiStore((state) => state.mobilePlayerExpanded)
@@ -44,8 +46,9 @@ export const AppShell = () => {
   useEffect(() => {
     if (viewportMode === 'desktop') {
       setMobileQueueOpen(false)
+      setMobileSidebarOpen(false)
     }
-  }, [setMobileQueueOpen, viewportMode])
+  }, [setMobileQueueOpen, setMobileSidebarOpen, viewportMode])
 
   useEffect(() => {
     if (viewportMode !== 'mobile' && mobilePlayerExpanded) {
@@ -54,40 +57,43 @@ export const AppShell = () => {
   }, [mobilePlayerExpanded, setMobilePlayerExpanded, viewportMode])
 
   return (
-    <div className="terminal-grid min-h-screen pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-40 lg:pb-32">
+    <div className="terminal-grid flex h-screen flex-col">
       <TopBar />
-      <ResponsiveLayout
-        viewportMode={viewportMode}
-        desktopSidebar={
-          <DesktopSidebar
-            collapsed={desktopSidebarCollapsed}
-            onToggleCollapsed={() => setDesktopSidebarCollapsed(!desktopSidebarCollapsed)}
-          />
-        }
-        tabletSidebar={<TabletSidebarRail />}
-        queueDock={
-          viewportMode === 'desktop' ? (
-            desktopQueueCollapsed ? (
-              <div className="terminal-panel h-fit p-2">
-                <button
-                  type="button"
-                  className="terminal-button min-h-11 w-full justify-center"
-                  onClick={() => setDesktopQueueCollapsed(false)}
-                  aria-label="Open queue dock"
-                >
-                  open queue
-                </button>
-              </div>
-            ) : (
-              <QueueDock />
-            )
-          ) : null
-        }
-      >
-        <Outlet />
-      </ResponsiveLayout>
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <ResponsiveLayout
+          viewportMode={viewportMode}
+          desktopSidebar={
+            <DesktopSidebar
+              collapsed={desktopSidebarCollapsed}
+              onToggleCollapsed={() => setDesktopSidebarCollapsed(!desktopSidebarCollapsed)}
+            />
+          }
+          desktopSidebarCollapsed={desktopSidebarCollapsed}
+          queueDock={
+            viewportMode === 'desktop' ? (
+              desktopQueueCollapsed ? (
+                <div className="terminal-panel h-fit p-2">
+                  <button
+                    type="button"
+                    className="terminal-button min-h-11 w-full justify-center"
+                    onClick={() => setDesktopQueueCollapsed(false)}
+                    aria-label="Open queue dock"
+                  >
+                    open queue
+                  </button>
+                </div>
+              ) : (
+                <QueueDock />
+              )
+            ) : null
+          }
+        >
+          <Outlet />
+        </ResponsiveLayout>
+      </div>
       <BottomPlayer viewportMode={viewportMode} />
       {viewportMode !== 'desktop' ? <QueueDrawer open={mobileQueueOpen} onClose={() => setMobileQueueOpen(false)} /> : null}
+      {viewportMode !== 'desktop' ? <SidebarDrawer open={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} /> : null}
       {viewportMode === 'tablet' ? <QueueFab count={queueCount} onClick={() => setMobileQueueOpen(true)} /> : null}
       <MobileNavBar />
     </div>

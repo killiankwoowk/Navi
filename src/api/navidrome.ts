@@ -271,6 +271,14 @@ export const createNavidromeClient = (credentials: SubsonicCredentials): Navidro
         },
       })
     },
+    scrobble: async (songId: string, submission = true) => {
+      await instance.get('/scrobble.view', {
+        params: {
+          id: songId,
+          submission: submission ? 'true' : 'false',
+        },
+      })
+    },
     streamViewUrl,
     getStreamUrl: streamViewUrl,
     getCoverArt,

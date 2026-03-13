@@ -177,6 +177,7 @@ export interface NavidromeClient {
   getPlaylist: (id: string) => Promise<Playlist>
   createPlaylist: (name: string, songIds?: string[]) => Promise<Playlist>
   updatePlaylist: (input: UpdatePlaylistInput) => Promise<void>
+  scrobble: (songId: string, submission?: boolean) => Promise<void>
   streamViewUrl: (songId: string, opts?: StreamOptions) => string
   getStreamUrl: (songId: string, opts?: StreamOptions) => string
   getCoverArt: (coverArtId: string, size?: number) => string

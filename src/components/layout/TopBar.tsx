@@ -1,16 +1,18 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Search } from 'lucide-react'
+import { LogOut, Menu, Search } from 'lucide-react'
 
 import { AsciiLogo } from '@/components/common/AsciiLogo'
 import { useAuth } from '@/features/auth/useAuth'
 import { useViewportMode } from '@/hooks/useViewportMode'
+import { useUiStore } from '@/store/uiStore'
 
 export const TopBar = () => {
   const navigate = useNavigate()
   const { logout } = useAuth()
   const viewportMode = useViewportMode()
+  const openSidebar = useUiStore((state) => state.openSidebar)
   const [searchInput, setSearchInput] = useState('')
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -23,7 +25,17 @@ export const TopBar = () => {
     return (
       <header className="terminal-panel mx-2 mt-2">
         <div className="flex items-center justify-between px-3 py-2">
-          <div className="text-xs uppercase tracking-[0.16em] text-terminal-accent">Navi Terminal</div>
+          <div className="flex items-center gap-2">
+            <button
+              className="terminal-button min-h-11 px-2 py-1"
+              onClick={openSidebar}
+              type="button"
+              aria-label="Open navigation"
+            >
+              <Menu size={14} />
+            </button>
+            <div className="text-xs uppercase tracking-[0.16em] text-terminal-accent">Navi Terminal</div>
+          </div>
           <div className="flex items-center gap-2">
             <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button" aria-label="Open search">
               <Search size={14} />
@@ -59,10 +71,16 @@ export const TopBar = () => {
               </button>
             </form>
           ) : (
-            <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button">
-              <Search size={14} />
-              search
-            </button>
+            <>
+              <button className="terminal-button min-h-11 px-2 py-1" onClick={openSidebar} type="button" aria-label="Open navigation">
+                <Menu size={14} />
+                menu
+              </button>
+              <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button">
+                <Search size={14} />
+                search
+              </button>
+            </>
           )}
           <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/profile')} type="button">
             profile
@@ -78,4 +96,3 @@ export const TopBar = () => {
     </header>
   )
 }
-

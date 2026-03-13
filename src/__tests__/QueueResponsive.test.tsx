@@ -25,6 +25,7 @@ describe('Queue responsive components', () => {
     })
     useUiStore.setState({
       desktopQueueCollapsed: false,
+      mobileSidebarOpen: false,
       mobileQueueOpen: false,
       mobilePlayerExpanded: false,
       desktopSidebarCollapsed: false,
