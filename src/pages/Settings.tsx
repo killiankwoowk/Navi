@@ -1,10 +1,8 @@
-import { type ChangeEvent, useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { type ChangeEvent, useRef, useState } from 'react'
 
 import type { AudioQuality, SleepTimerDefault } from '@/api/types'
 import { TerminalPanel } from '@/components/common/TerminalPanel'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { getLastfmAuthToken, getLastfmAuthUrl, getLastfmSession } from '@/services/lastfmService'
 import { useSettingsStore } from '@/store/settingsStore'
 
 const qualityOptions: Array<{ value: AudioQuality; label: string; hint: string }> = [
@@ -29,12 +27,6 @@ export const Settings = () => {
   const themeMode = useSettingsStore((state) => state.themeMode)
   const fontMode = useSettingsStore((state) => state.fontMode)
   const analyticsEnabled = useSettingsStore((state) => state.analyticsEnabled)
-  const lastfmEnabled = useSettingsStore((state) => state.lastfmEnabled)
-  const lastfmApiKey = useSettingsStore((state) => state.lastfmApiKey)
-  const lastfmApiSecret = useSettingsStore((state) => state.lastfmApiSecret)
-  const lastfmUsername = useSettingsStore((state) => state.lastfmUsername)
-  const lastfmSessionKey = useSettingsStore((state) => state.lastfmSessionKey)
-
   const setAudioQuality = useSettingsStore((state) => state.setAudioQuality)
   const setGaplessEnabled = useSettingsStore((state) => state.setGaplessEnabled)
   const setCrossfadeSeconds = useSettingsStore((state) => state.setCrossfadeSeconds)
@@ -46,22 +38,12 @@ export const Settings = () => {
   const setThemeMode = useSettingsStore((state) => state.setThemeMode)
   const setFontMode = useSettingsStore((state) => state.setFontMode)
   const setAnalyticsEnabled = useSettingsStore((state) => state.setAnalyticsEnabled)
-  const setLastfmEnabled = useSettingsStore((state) => state.setLastfmEnabled)
-  const setLastfmApiKey = useSettingsStore((state) => state.setLastfmApiKey)
-  const setLastfmApiSecret = useSettingsStore((state) => state.setLastfmApiSecret)
-  const setLastfmUsername = useSettingsStore((state) => state.setLastfmUsername)
-  const setLastfmSession = useSettingsStore((state) => state.setLastfmSession)
-  const clearLastfmSession = useSettingsStore((state) => state.clearLastfmSession)
   const exportSettings = useSettingsStore((state) => state.exportSettings)
   const importSettings = useSettingsStore((state) => state.importSettings)
 
   const [showApiKey, setShowApiKey] = useState(false)
-  const [showLastfmSecret, setShowLastfmSecret] = useState(false)
-  const [lastfmError, setLastfmError] = useState<string | null>(null)
-  const [lastfmBusy, setLastfmBusy] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
   const inputFileRef = useRef<HTMLInputElement>(null)
-  const [searchParams, setSearchParams] = useSearchParams()
 
   const downloadSettings = () => {
     const blob = new Blob([exportSettings()], { type: 'application/json' })
@@ -81,47 +63,6 @@ export const Settings = () => {
     setImportError(result.ok ? null : result.error ?? 'Failed to import settings')
     event.target.value = ''
   }
-
-  const connectLastfm = async () => {
-    if (!lastfmApiKey || !lastfmApiSecret) {
-      setLastfmError('Provide Last.fm API key and secret first.')
-      return
-    }
-    setLastfmError(null)
-    setLastfmBusy(true)
-    try {
-      const token = await getLastfmAuthToken(lastfmApiKey, lastfmApiSecret)
-      const callbackUrl = `${window.location.origin}/settings`
-      const authUrl = getLastfmAuthUrl(lastfmApiKey, token, callbackUrl)
-      window.location.assign(authUrl)
-    } catch (error) {
-      setLastfmError(error instanceof Error ? error.message : 'Failed to start Last.fm auth.')
-    } finally {
-      setLastfmBusy(false)
-    }
-  }
-
-  useEffect(() => {
-    const token = searchParams.get('lastfmToken') ?? searchParams.get('token')
-    if (!token || !lastfmApiKey || !lastfmApiSecret) return
-
-    setLastfmBusy(true)
-    setLastfmError(null)
-    getLastfmSession(lastfmApiKey, lastfmApiSecret, token)
-      .then((session) => {
-        setLastfmSession(session.key, session.name)
-        const nextParams = new URLSearchParams(searchParams)
-        nextParams.delete('lastfmToken')
-        nextParams.delete('token')
-        setSearchParams(nextParams, { replace: true })
-      })
-      .catch((error) => {
-        setLastfmError(error instanceof Error ? error.message : 'Failed to connect Last.fm.')
-      })
-      .finally(() => {
-        setLastfmBusy(false)
-      })
-  }, [lastfmApiKey, lastfmApiSecret, searchParams, setLastfmSession, setSearchParams])
 
   return (
     <TerminalPanel title="Settings">
@@ -231,96 +172,6 @@ export const Settings = () => {
               </button>
             </div>
           </div>
-        </section>
-
-        <section className="space-y-2 border border-terminal-text/20 p-3">
-          <h2 className="m-0 text-xs uppercase tracking-[0.16em] text-terminal-muted">Last.fm</h2>
-          <label className="flex items-center gap-2 text-xs">
-            <input
-              type="checkbox"
-              checked={lastfmEnabled}
-              onChange={(event) => {
-                const nextValue = event.target.checked
-                if (nextValue && !lastfmSessionKey) {
-                  setLastfmError('Connect Last.fm before enabling scrobbling.')
-                  return
-                }
-                setLastfmError(null)
-                setLastfmEnabled(nextValue)
-              }}
-            />
-            <span>Enable Last.fm scrobbling</span>
-          </label>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <label className="block space-y-1 text-xs">
-              <span className="text-terminal-muted">API Key</span>
-              <input
-                className="terminal-input"
-                value={lastfmApiKey}
-                onChange={(event) => setLastfmApiKey(event.target.value)}
-                placeholder="Last.fm API key"
-              />
-            </label>
-            <label className="block space-y-1 text-xs">
-              <span className="text-terminal-muted">API Secret</span>
-              <div className="flex flex-wrap items-center gap-2">
-                <input
-                  className="terminal-input flex-1"
-                  type={showLastfmSecret ? 'text' : 'password'}
-                  value={lastfmApiSecret}
-                  onChange={(event) => setLastfmApiSecret(event.target.value)}
-                  placeholder="Last.fm API secret"
-                />
-                <button
-                  type="button"
-                  className="terminal-button min-h-11 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-terminal-green"
-                  onClick={() => setShowLastfmSecret((value) => !value)}
-                >
-                  {showLastfmSecret ? 'hide' : 'show'}
-                </button>
-              </div>
-            </label>
-          </div>
-          <label className="block space-y-1 text-xs">
-            <span className="text-terminal-muted">Username</span>
-            <input
-              className="terminal-input"
-              value={lastfmUsername}
-              onChange={(event) => setLastfmUsername(event.target.value)}
-              placeholder="Last.fm username"
-            />
-          </label>
-          <label className="block space-y-1 text-xs">
-            <span className="text-terminal-muted">Session Key</span>
-            <input className="terminal-input" value={lastfmSessionKey} readOnly placeholder="Not connected" />
-          </label>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              className="terminal-button min-h-11 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-terminal-green"
-              onClick={connectLastfm}
-              disabled={lastfmBusy}
-            >
-              {lastfmBusy ? 'connecting...' : 'connect last.fm'}
-            </button>
-            <button
-              type="button"
-              className="terminal-button min-h-11 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-terminal-green"
-              onClick={() => {
-                clearLastfmSession()
-                setLastfmError(null)
-              }}
-              disabled={lastfmBusy}
-            >
-              disconnect
-            </button>
-          </div>
-          {lastfmSessionKey ? (
-            <p className="m-0 text-xs text-terminal-muted">Connected as {lastfmUsername || 'unknown user'}.</p>
-          ) : (
-            <p className="m-0 text-xs text-terminal-muted">Connect Last.fm to enable scrobbling.</p>
-          )}
-          {lastfmError ? <p className="m-0 text-xs text-terminal-warn">{lastfmError}</p> : null}
         </section>
 
         <section className="space-y-2 border border-terminal-text/20 p-3">

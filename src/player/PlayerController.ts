@@ -47,8 +47,10 @@ export const createScrobbleController = (initialClient: ScrobbleClient): Scrobbl
       void client.nowPlaying(currentTrack)
     },
     onProgress: (progress, duration) => {
-      if (!currentTrack || submitted || !duration) return
-      if (progress >= duration * 0.5) {
+      if (!currentTrack || submitted) return
+      const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0
+      const threshold = safeDuration > 0 ? Math.min(safeDuration * 0.5, 240) : 240
+      if (progress >= threshold) {
         submitIfNeeded()
       }
     },

@@ -22,6 +22,7 @@ interface DesktopPlayerBarProps {
   defaultSleepTimer: SleepTimerDefault
   queueActive: boolean
   lyricsActive: boolean
+  scrobbleCount: number
   onTogglePlay: () => void
   onPrevious: () => void
   onNext: () => void
@@ -52,6 +53,7 @@ export const DesktopPlayerBar = ({
   defaultSleepTimer,
   queueActive,
   lyricsActive,
+  scrobbleCount,
   onTogglePlay,
   onPrevious,
   onNext,
@@ -121,6 +123,10 @@ export const DesktopPlayerBar = ({
             onCancel={onCancelSleepTimer}
           />
           <VolumeControl volume={volume} onChange={onVolumeChange} />
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-terminal-muted xl:justify-end">
+          <span className="border border-terminal-text/30 px-1 uppercase tracking-[0.14em] text-terminal-accent">last.fm</span>
+          <span className="text-terminal-text">{scrobbleCount}</span>
         </div>
         <div className="text-xs text-terminal-muted">
           [{currentIndex + 1}/{queueLength || 0}] {track?.album ?? '--'}

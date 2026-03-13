@@ -26,7 +26,7 @@ Spotify-style Navidrome web frontend with a terminal/CLI visual theme.
 - Lyrics panel with sync/follow controls and fallback sources
 - Favorites / Most Played / Recently Played pages
 - Profile and Settings pages (quality, sleep default, lyrics, theme/font, privacy import/export)
-- Last.fm scrobbling (optional) with connect/disconnect in Settings
+- Scrobble support via Navidrome (`scrobble.view`) with in-player confirmation counter
 - Audio quality control (`auto`, `low`, `medium`, `high`) via `maxBitRate`
 - Cover art via `getCoverArt.view`
 - Stream playback via `/rest/stream.view`
@@ -52,11 +52,8 @@ Settings page also supports a local Genius key override (`Settings -> Lyrics`), 
 
 ### Last.fm scrobbling
 
-1. Go to `Settings -> Last.fm`.
-2. Enter your API key + secret.
-3. Click **connect last.fm** to authorize in the same tab.
-4. After returning, the session key is stored and you can toggle scrobbling.
-5. Use **disconnect** to clear the session key locally.
+Last.fm authentication is handled by your Navidrome server. Configure it in the Navidrome admin UI.  
+This client only reports playback via `scrobble.view` and shows a session scrobble counter in the player.
 
 ## Quality checks
 

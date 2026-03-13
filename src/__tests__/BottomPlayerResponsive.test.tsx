@@ -36,11 +36,6 @@ describe('BottomPlayer responsive modes', () => {
       themeMode: 'terminal-dark',
       fontMode: 'jetbrains',
       analyticsEnabled: false,
-      lastfmEnabled: false,
-      lastfmApiKey: '',
-      lastfmApiSecret: '',
-      lastfmUsername: '',
-      lastfmSessionKey: '',
     })
     useUiStore.setState({
       mobilePlayerExpanded: false,
@@ -50,6 +45,7 @@ describe('BottomPlayer responsive modes', () => {
       lyricsPanelOpen: false,
       lyricsTargetSong: null,
       streamQualityWarning: null,
+      scrobbleCount: 0,
       queuePanelOpen: false,
       compactMode: false,
       libraryAlbumType: 'alphabeticalByName',

@@ -11,6 +11,7 @@ interface UiStore {
   lyricsPanelOpen: boolean
   lyricsTargetSong: Song | null
   streamQualityWarning: string | null
+  scrobbleCount: number
   desktopSidebarCollapsed: boolean
   desktopQueueCollapsed: boolean
   mobileSidebarOpen: boolean
@@ -25,6 +26,7 @@ interface UiStore {
   openLyricsPanel: (song?: Song | null) => void
   closeLyricsPanel: () => void
   setStreamQualityWarning: (message: string | null) => void
+  incrementScrobbleCount: () => void
   setDesktopSidebarCollapsed: (value: boolean) => void
   setDesktopQueueCollapsed: (value: boolean) => void
   setMobileSidebarOpen: (value: boolean) => void
@@ -46,6 +48,7 @@ export const useUiStore = create<UiStore>()(
       lyricsPanelOpen: false,
       lyricsTargetSong: null,
       streamQualityWarning: null,
+      scrobbleCount: 0,
       desktopSidebarCollapsed: false,
       desktopQueueCollapsed: false,
       mobileSidebarOpen: false,
@@ -60,6 +63,7 @@ export const useUiStore = create<UiStore>()(
       openLyricsPanel: (song) => set({ lyricsPanelOpen: true, lyricsTargetSong: song ?? null }),
       closeLyricsPanel: () => set({ lyricsPanelOpen: false, lyricsTargetSong: null }),
       setStreamQualityWarning: (streamQualityWarning) => set({ streamQualityWarning }),
+      incrementScrobbleCount: () => set((state) => ({ scrobbleCount: state.scrobbleCount + 1 })),
       setDesktopSidebarCollapsed: (desktopSidebarCollapsed) => set({ desktopSidebarCollapsed }),
       setDesktopQueueCollapsed: (desktopQueueCollapsed) => set({ desktopQueueCollapsed }),
       setMobileSidebarOpen: (mobileSidebarOpen) => set({ mobileSidebarOpen }),

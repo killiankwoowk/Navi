@@ -17,11 +17,6 @@ interface SettingsSnapshot {
   themeMode: ThemeMode
   fontMode: FontMode
   analyticsEnabled: boolean
-  lastfmEnabled: boolean
-  lastfmApiKey: string
-  lastfmApiSecret: string
-  lastfmUsername: string
-  lastfmSessionKey: string
 }
 
 interface SettingsState extends SettingsSnapshot {
@@ -39,13 +34,6 @@ interface SettingsState extends SettingsSnapshot {
   setThemeMode: (theme: ThemeMode) => void
   setFontMode: (font: FontMode) => void
   setAnalyticsEnabled: (enabled: boolean) => void
-  setLastfmEnabled: (enabled: boolean) => void
-  setLastfmApiKey: (value: string) => void
-  setLastfmApiSecret: (value: string) => void
-  setLastfmUsername: (value: string) => void
-  setLastfmSessionKey: (value: string) => void
-  setLastfmSession: (sessionKey: string, username: string) => void
-  clearLastfmSession: () => void
   exportSettings: () => string
   importSettings: (json: string) => { ok: boolean; error?: string }
 }
@@ -79,11 +67,6 @@ const initialSnapshot: SettingsSnapshot = {
   themeMode: 'terminal-dark',
   fontMode: 'jetbrains',
   analyticsEnabled: false,
-  lastfmEnabled: false,
-  lastfmApiKey: '',
-  lastfmApiSecret: '',
-  lastfmUsername: '',
-  lastfmSessionKey: '',
 }
 
 const getPersistedSnapshot = (state: SettingsState): SettingsSnapshot => ({
@@ -100,11 +83,6 @@ const getPersistedSnapshot = (state: SettingsState): SettingsSnapshot => ({
   themeMode: state.themeMode,
   fontMode: state.fontMode,
   analyticsEnabled: state.analyticsEnabled,
-  lastfmEnabled: state.lastfmEnabled,
-  lastfmApiKey: state.lastfmApiKey,
-  lastfmApiSecret: state.lastfmApiSecret,
-  lastfmUsername: state.lastfmUsername,
-  lastfmSessionKey: state.lastfmSessionKey,
 })
 
 const normalizeImportedSettings = (input: unknown): Partial<SettingsSnapshot> => {
@@ -134,11 +112,6 @@ const normalizeImportedSettings = (input: unknown): Partial<SettingsSnapshot> =>
   if (raw.themeMode === 'terminal-dark' || raw.themeMode === 'terminal-contrast') next.themeMode = raw.themeMode
   if (raw.fontMode === 'jetbrains' || raw.fontMode === 'fira') next.fontMode = raw.fontMode
   if (typeof raw.analyticsEnabled === 'boolean') next.analyticsEnabled = raw.analyticsEnabled
-  if (typeof raw.lastfmEnabled === 'boolean') next.lastfmEnabled = raw.lastfmEnabled
-  if (typeof raw.lastfmApiKey === 'string') next.lastfmApiKey = raw.lastfmApiKey
-  if (typeof raw.lastfmApiSecret === 'string') next.lastfmApiSecret = raw.lastfmApiSecret
-  if (typeof raw.lastfmUsername === 'string') next.lastfmUsername = raw.lastfmUsername
-  if (typeof raw.lastfmSessionKey === 'string') next.lastfmSessionKey = raw.lastfmSessionKey
 
   return next
 }
@@ -161,24 +134,6 @@ export const useSettingsStore = create<SettingsState>()(
       setThemeMode: (themeMode) => set({ themeMode }),
       setFontMode: (fontMode) => set({ fontMode }),
       setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
-      setLastfmEnabled: (lastfmEnabled) =>
-        set((state) => {
-          if (lastfmEnabled && !state.lastfmSessionKey) {
-            return { lastfmEnabled: false }
-          }
-          return { lastfmEnabled }
-        }),
-      setLastfmApiKey: (lastfmApiKey) => set({ lastfmApiKey: lastfmApiKey.trim() }),
-      setLastfmApiSecret: (lastfmApiSecret) => set({ lastfmApiSecret: lastfmApiSecret.trim() }),
-      setLastfmUsername: (lastfmUsername) => set({ lastfmUsername: lastfmUsername.trim() }),
-      setLastfmSessionKey: (lastfmSessionKey) => set({ lastfmSessionKey: lastfmSessionKey.trim() }),
-      setLastfmSession: (sessionKey, username) =>
-        set({
-          lastfmSessionKey: sessionKey.trim(),
-          lastfmUsername: username.trim(),
-          lastfmEnabled: true,
-        }),
-      clearLastfmSession: () => set({ lastfmSessionKey: '', lastfmEnabled: false, lastfmUsername: '' }),
       exportSettings: () => JSON.stringify(getPersistedSnapshot(get()), null, 2),
       importSettings: (json) => {
         try {
@@ -199,7 +154,6 @@ export const useSettingsStore = create<SettingsState>()(
         const normalized = normalizeImportedSettings(persistedState)
         return {
           ...initialSnapshot,
-          ...(persistedState as Record<string, unknown>),
           ...normalized,
         }
       },

@@ -37,6 +37,7 @@ describe('Queue responsive components', () => {
       lyricsPanelOpen: false,
       lyricsTargetSong: null,
       streamQualityWarning: null,
+      scrobbleCount: 0,
     })
   })
 

@@ -30,11 +30,6 @@ describe('Profile', () => {
       themeMode: 'terminal-dark',
       fontMode: 'jetbrains',
       analyticsEnabled: false,
-      lastfmEnabled: false,
-      lastfmApiKey: '',
-      lastfmApiSecret: '',
-      lastfmUsername: '',
-      lastfmSessionKey: '',
     })
 
     useUsageStore.setState({

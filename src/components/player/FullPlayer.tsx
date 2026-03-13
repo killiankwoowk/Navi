@@ -17,6 +17,7 @@ interface FullPlayerProps {
   progress: number
   duration: number
   queueCount: number
+  scrobbleCount: number
   onClose: () => void
   onTogglePlay: () => void
   onPrevious: () => void
@@ -38,6 +39,7 @@ export const FullPlayer = ({
   progress,
   duration,
   queueCount,
+  scrobbleCount,
   onClose,
   onTogglePlay,
   onPrevious,
@@ -85,6 +87,12 @@ export const FullPlayer = ({
             <p className="m-0 truncate text-sm text-terminal-muted">{track?.artist ?? 'Unknown artist'}</p>
           </div>
           <ProgressBar progress={progress} duration={duration} onSeek={onSeek} />
+          <div className="flex justify-center">
+            <div className="flex items-center gap-2 text-[11px] text-terminal-muted">
+              <span className="border border-terminal-text/30 px-1 uppercase tracking-[0.14em] text-terminal-accent">last.fm</span>
+              <span className="text-terminal-text">{scrobbleCount}</span>
+            </div>
+          </div>
           <div className="flex justify-center">
             <TransportControls
               isPlaying={isPlaying}

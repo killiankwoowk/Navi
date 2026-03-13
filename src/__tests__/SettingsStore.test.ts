@@ -19,11 +19,6 @@ describe('settings store', () => {
       themeMode: 'terminal-dark',
       fontMode: 'jetbrains',
       analyticsEnabled: false,
-      lastfmEnabled: false,
-      lastfmApiKey: '',
-      lastfmApiSecret: '',
-      lastfmUsername: '',
-      lastfmSessionKey: '',
     })
   })
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 
-import type { Song, ViewportMode } from '@/api/types'
+import type { ViewportMode } from '@/api/types'
 import { LyricsPanel } from '@/components/Lyrics/LyricsPanel'
 import { DesktopPlayerBar } from '@/components/player/DesktopPlayerBar'
 import { FullPlayer } from '@/components/player/FullPlayer'
@@ -9,7 +9,7 @@ import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { audioEngine } from '@/player/audioEngine'
 import { createScrobbleController } from '@/player/PlayerController'
 import { getCurrentQueueItem } from '@/player/playback'
-import { createLastfmClient } from '@/services/lastfmService'
+import { createNavidromeScrobbleClient } from '@/player/scrobbleClient'
 import { usePlayerStore } from '@/store/playerStore'
 import { useSettingsStore } from '@/store/settingsStore'
 import { useUiStore } from '@/store/uiStore'
@@ -47,11 +47,6 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   const incrementPlay = useUsageStore((state) => state.incrementPlay)
   const audioQuality = useSettingsStore((state) => state.audioQuality)
   const defaultSleepTimer = useSettingsStore((state) => state.defaultSleepTimer)
-  const lastfmEnabled = useSettingsStore((state) => state.lastfmEnabled)
-  const lastfmApiKey = useSettingsStore((state) => state.lastfmApiKey)
-  const lastfmApiSecret = useSettingsStore((state) => state.lastfmApiSecret)
-  const lastfmUsername = useSettingsStore((state) => state.lastfmUsername)
-  const lastfmSessionKey = useSettingsStore((state) => state.lastfmSessionKey)
 
   const lyricsPanelOpen = useUiStore((state) => state.lyricsPanelOpen)
   const lyricsTargetSong = useUiStore((state) => state.lyricsTargetSong)
@@ -59,6 +54,8 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
   const closeLyricsPanel = useUiStore((state) => state.closeLyricsPanel)
   const streamQualityWarning = useUiStore((state) => state.streamQualityWarning)
   const setStreamQualityWarning = useUiStore((state) => state.setStreamQualityWarning)
+  const scrobbleCount = useUiStore((state) => state.scrobbleCount)
+  const incrementScrobbleCount = useUiStore((state) => state.incrementScrobbleCount)
   const desktopQueueCollapsed = useUiStore((state) => state.desktopQueueCollapsed)
   const setDesktopQueueCollapsed = useUiStore((state) => state.setDesktopQueueCollapsed)
   const setMobileQueueOpen = useUiStore((state) => state.setMobileQueueOpen)
@@ -90,51 +87,9 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
     audioEngine.setVolume(volume)
   }, [volume])
 
-  const lastfmClient = useMemo(() => {
-    if (!lastfmEnabled || !lastfmApiKey || !lastfmApiSecret || !lastfmSessionKey) return null
-    return createLastfmClient({
-      apiKey: lastfmApiKey,
-      apiSecret: lastfmApiSecret,
-      sessionKey: lastfmSessionKey,
-      username: lastfmUsername,
-    })
-  }, [lastfmApiKey, lastfmApiSecret, lastfmEnabled, lastfmSessionKey, lastfmUsername])
-
   const scrobbleClient = useMemo(
-    () => ({
-      nowPlaying: async (track: Song) => {
-        if (client) {
-          await client.scrobble(track.id, false).catch(() => null)
-        }
-        if (lastfmClient && track.artist && track.title) {
-          await lastfmClient
-            .updateNowPlaying({
-              artist: track.artist,
-              track: track.title,
-              album: track.album,
-              duration: track.duration,
-            })
-            .catch(() => null)
-        }
-      },
-      submit: async (track: Song, startedAt: number) => {
-        if (client) {
-          await client.scrobble(track.id, true).catch(() => null)
-        }
-        if (lastfmClient && track.artist && track.title) {
-          await lastfmClient
-            .scrobble({
-              artist: track.artist,
-              track: track.title,
-              album: track.album,
-              duration: track.duration,
-              timestamp: Math.floor(startedAt / 1000),
-            })
-            .catch(() => null)
-        }
-      },
-    }),
-    [client, lastfmClient],
+    () => createNavidromeScrobbleClient({ client, onScrobble: incrementScrobbleCount }),
+    [client, incrementScrobbleCount],
   )
 
   useEffect(() => {
@@ -274,6 +229,7 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
             progress={progress}
             duration={duration}
             queueCount={queue.length}
+            scrobbleCount={scrobbleCount}
             onClose={() => setMobilePlayerExpanded(false)}
             onTogglePlay={togglePlay}
             onPrevious={() => {
@@ -306,6 +262,7 @@ export const BottomPlayer = ({ viewportMode }: BottomPlayerProps) => {
           defaultSleepTimer={defaultSleepTimer}
           queueActive={!desktopQueueCollapsed}
           lyricsActive={lyricsPanelOpen}
+          scrobbleCount={scrobbleCount}
           onTogglePlay={togglePlay}
           onPrevious={() => {
             previous(audioEngine.element.currentTime)

@@ -25,6 +25,7 @@ describe('PlaylistView grid/list toggle', () => {
       playlistViewMode: 'list',
       lyricsPanelOpen: false,
       lyricsTargetSong: null,
+      scrobbleCount: 0,
     })
   })
 
