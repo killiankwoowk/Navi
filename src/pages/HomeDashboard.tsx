@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import type { Album } from '@/api/types'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingRows } from '@/components/common/LoadingRows'
-import { TerminalPanel } from '@/components/common/TerminalPanel'
 import { ResponsiveAlbumGrid } from '@/components/albums/ResponsiveAlbumGrid'
 import { AlbumCard } from '@/components/home/AlbumCard'
 import { CarouselRow } from '@/components/home/CarouselRow'
@@ -64,26 +63,31 @@ export const HomeDashboard = () => {
   }, [recentlyAdded.data, suggestedAlbums.data, topAlbums.data])
 
   return (
-    <TerminalPanel title="Home Dashboard" className="space-y-3">
+    <div className="space-y-8">
+      <header className="flex items-center justify-between">
+        <h1 className="m-0 text-lg font-semibold text-nothing-100">Home</h1>
+      </header>
       {recentlyAdded.isLoading || topAlbums.isLoading ? <LoadingRows rows={4} /> : null}
       {!recentlyAdded.isLoading && !topAlbums.isLoading && mainFeed.length === 0 ? (
         <EmptyState title="No albums available." hint="Check Navidrome scan status." />
       ) : null}
 
       {featuredAlbums.length > 0 ? (
-        <CarouselRow title="Featured">
-          {featuredAlbums.map((album) => (
-            <div key={`featured-${album.id}`} className="min-w-[180px] max-w-[220px] sm:min-w-[220px] sm:max-w-[260px]">
+        <section className="space-y-3">
+          <header className="text-xs uppercase tracking-[0.16em] text-nothing-300">Featured Picks</header>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {featuredAlbums.slice(0, 4).map((album) => (
               <AlbumCard
+                key={`featured-${album.id}`}
                 album={album}
                 coverUrl={coverUrlForAlbum(album, heroCoverSize)}
                 onPlay={() => playAlbum(album)}
                 onQueue={() => playAlbum(album, true)}
                 onOpen={() => navigate(`/album/${album.id}`)}
               />
-            </div>
-          ))}
-        </CarouselRow>
+            ))}
+          </div>
+        </section>
       ) : null}
 
       <CarouselRow title="Recently Added">
@@ -118,12 +122,12 @@ export const HomeDashboard = () => {
         {(playlists.data ?? []).map((playlist) => (
           <button
             key={playlist.id}
-            className="terminal-card min-h-24 min-w-[200px] px-3 py-3 text-left text-sm"
+            className="min-h-24 min-w-[200px] rounded border border-nothing-700 bg-nothing-800 px-3 py-3 text-left text-sm text-nothing-100 hover:bg-nothing-700"
             onClick={() => navigate('/playlists')}
             type="button"
           >
-            <div className="text-terminal-text">{playlist.name}</div>
-            <div className="mt-1 text-xs text-terminal-muted">{playlist.songCount ?? 0} tracks</div>
+            <div className="text-nothing-100">{playlist.name}</div>
+            <div className="mt-1 text-xs text-nothing-300">{playlist.songCount ?? 0} tracks</div>
           </button>
         ))}
       </CarouselRow>
@@ -143,7 +147,7 @@ export const HomeDashboard = () => {
       </CarouselRow>
 
       <section className="space-y-2">
-        <header className="text-xs uppercase tracking-[0.16em] text-terminal-muted">Main Feed Grid</header>
+        <header className="text-xs uppercase tracking-[0.16em] text-nothing-300">Main Feed Grid</header>
         <ResponsiveAlbumGrid
           albums={mainFeed}
           coverUrlForAlbum={coverUrlForAlbum}
@@ -152,7 +156,6 @@ export const HomeDashboard = () => {
           onOpenAlbum={(albumId) => navigate(`/album/${albumId}`)}
         />
       </section>
-    </TerminalPanel>
+    </div>
   )
 }
-

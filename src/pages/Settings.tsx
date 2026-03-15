@@ -179,13 +179,8 @@ export const Settings = () => {
           <div className="grid gap-2 sm:grid-cols-2">
             <label className="block space-y-1 text-xs">
               <span className="text-terminal-muted">Theme</span>
-              <select
-                value={themeMode}
-                onChange={(event) => setThemeMode(event.target.value as 'terminal-dark' | 'terminal-contrast')}
-                className="terminal-input"
-              >
-                <option value="terminal-dark">Terminal Dark</option>
-                <option value="terminal-contrast">Terminal High Contrast</option>
+              <select value={themeMode} onChange={() => setThemeMode('nothing')} className="terminal-input">
+                <option value="nothing">Nothing</option>
               </select>
             </label>
             <label className="block space-y-1 text-xs">

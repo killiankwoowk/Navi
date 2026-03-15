@@ -271,6 +271,20 @@ export const createNavidromeClient = (credentials: SubsonicCredentials): Navidro
         },
       })
     },
+    star: async (songId: string) => {
+      await instance.get('/star.view', {
+        params: {
+          id: songId,
+        },
+      })
+    },
+    unstar: async (songId: string) => {
+      await instance.get('/unstar.view', {
+        params: {
+          id: songId,
+        },
+      })
+    },
     scrobble: async (songId: string, submission = true) => {
       await instance.get('/scrobble.view', {
         params: {

@@ -15,8 +15,6 @@ import { SidebarDrawer } from './SidebarDrawer'
 import { TopBar } from './TopBar'
 import { QueueDock } from '@/components/player/QueueDock'
 import { QueueDrawer } from '@/components/player/QueueDrawer'
-import { QueueFab } from '@/components/player/QueueFab'
-import { usePlayerStore } from '@/store/playerStore'
 
 export const AppShell = () => {
   const { bindAuthFailure } = useAuth()
@@ -34,7 +32,6 @@ export const AppShell = () => {
   const setMobileQueueOpen = useUiStore((state) => state.setMobileQueueOpen)
   const mobilePlayerExpanded = useUiStore((state) => state.mobilePlayerExpanded)
   const setMobilePlayerExpanded = useUiStore((state) => state.setMobilePlayerExpanded)
-  const queueCount = usePlayerStore((state) => state.queue.length)
 
   useEffect(() => bindAuthFailure(), [bindAuthFailure])
 
@@ -71,20 +68,7 @@ export const AppShell = () => {
           desktopSidebarCollapsed={desktopSidebarCollapsed}
           queueDock={
             viewportMode === 'desktop' ? (
-              desktopQueueCollapsed ? (
-                <div className="terminal-panel h-fit p-2">
-                  <button
-                    type="button"
-                    className="terminal-button min-h-11 w-full justify-center"
-                    onClick={() => setDesktopQueueCollapsed(false)}
-                    aria-label="Open queue dock"
-                  >
-                    open queue
-                  </button>
-                </div>
-              ) : (
-                <QueueDock />
-              )
+              desktopQueueCollapsed ? null : <QueueDock />
             ) : null
           }
         >
@@ -94,7 +78,6 @@ export const AppShell = () => {
       <BottomPlayer viewportMode={viewportMode} />
       {viewportMode !== 'desktop' ? <QueueDrawer open={mobileQueueOpen} onClose={() => setMobileQueueOpen(false)} /> : null}
       {viewportMode !== 'desktop' ? <SidebarDrawer open={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} /> : null}
-      {viewportMode === 'tablet' ? <QueueFab count={queueCount} onClick={() => setMobileQueueOpen(true)} /> : null}
       <MobileNavBar />
     </div>
   )

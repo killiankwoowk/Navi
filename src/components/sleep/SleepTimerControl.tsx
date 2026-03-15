@@ -36,13 +36,13 @@ export const SleepTimerControl = ({
 
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="text-terminal-muted">sleep</span>
+      <span className="text-nothing-300">sleep</span>
       {SLEEP_TIMER_OPTIONS.map((minutes) => (
         <button
           key={minutes}
           type="button"
-          className={`terminal-button min-h-11 px-1 py-0.5 focus:outline-none focus:ring-2 focus:ring-terminal-green ${
-            defaultDuration === minutes ? 'border-terminal-accent text-terminal-accent' : ''
+          className={`terminal-button min-h-11 px-1 py-0.5 focus:outline-none focus:ring-2 focus:ring-accent ${
+            defaultDuration === minutes ? 'border-accent text-accent' : ''
           }`}
           onClick={() => onSetTimer(minutes)}
         >
@@ -52,7 +52,7 @@ export const SleepTimerControl = ({
       {durationMinutes ? (
         <button
           type="button"
-          className="terminal-button min-h-11 px-1 py-0.5 text-terminal-warn focus:outline-none focus:ring-2 focus:ring-terminal-green"
+          className="terminal-button min-h-11 px-1 py-0.5 text-nothing-100 focus:outline-none focus:ring-2 focus:ring-accent"
           onClick={onCancel}
         >
           cancel ({remaining})

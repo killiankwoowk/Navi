@@ -1,19 +1,24 @@
 import { Link, useParams } from 'react-router-dom'
 
-import { AddToPlaylistMenu } from '@/components/playlists/AddToPlaylistMenu'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingRows } from '@/components/common/LoadingRows'
 import { TerminalPanel } from '@/components/common/TerminalPanel'
+import { SongRow } from '@/components/common/SongRow'
 import { useArtistQuery } from '@/features/library/useLibrary'
+import { useAddSongToPlaylist, usePlaylistsQuery } from '@/features/playlists/usePlaylists'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { usePlayerStore } from '@/store/playerStore'
-import { formatDuration } from '@/utils/format'
+import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
+import { useMemo } from 'react'
 
 export const ArtistDetailPage = () => {
   const { id = '' } = useParams()
   const artistQuery = useArtistQuery(id)
   const setQueue = usePlayerStore((state) => state.setQueue)
   const addToQueue = usePlayerStore((state) => state.addToQueue)
+  const playlistsQuery = usePlaylistsQuery()
+  const addToPlaylist = useAddSongToPlaylist()
+  const client = useMemo(() => getNavidromeClientOrNull(), [])
 
   const title = artistQuery.data?.artist.name ?? 'Artist'
   useDocumentTitle(`${title} | Navi Terminal Player`)
@@ -41,31 +46,21 @@ export const ArtistDetailPage = () => {
           <section className="space-y-2">
             <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">songs</h3>
             {(artistQuery.data.song ?? []).slice(0, 40).map((song, index) => (
-              <div key={song.id} className="grid grid-cols-[24px_1fr_auto] items-center gap-2 border border-terminal-text/20 px-2 py-1">
-                <span className="text-[11px] text-terminal-muted">{index + 1}</span>
-                <Link
-                  to={`/song/${song.id}`}
-                  className="truncate text-left text-sm focus:outline-none focus:ring-2 focus:ring-terminal-green"
-                  aria-label={`Open song ${song.title}`}
-                >
-                  {song.title}
-                </Link>
-                <div className="flex items-center gap-1 text-[11px] text-terminal-muted">
-                  <span>{formatDuration(song.duration ?? 0)}</span>
-                  <button
-                    className="terminal-button px-1 py-0"
-                    type="button"
-                    onClick={() => setQueue(artistQuery.data.song ?? [], index, true)}
-                    aria-label={`Play ${song.title}`}
-                  >
-                    play
-                  </button>
-                  <button className="terminal-button px-1 py-0" type="button" onClick={() => addToQueue([song])}>
-                    +q
-                  </button>
-                  <AddToPlaylistMenu songId={song.id} />
-                </div>
-              </div>
+              <SongRow
+                key={song.id}
+                song={song}
+                indexLabel={index + 1}
+                playlists={playlistsQuery.data ?? []}
+                onPlay={() => setQueue(artistQuery.data?.song ?? [], index, true)}
+                onQueue={(selected) => addToQueue([selected])}
+                onAddToPlaylist={(playlistId, songId) => {
+                  void addToPlaylist.mutateAsync({ playlistId, songId })
+                }}
+                onToggleFavorite={(selected, next) => {
+                  if (!client) return
+                  void (next ? client.star(selected.id) : client.unstar(selected.id))
+                }}
+              />
             ))}
           </section>
         </div>

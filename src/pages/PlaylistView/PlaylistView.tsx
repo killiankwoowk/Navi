@@ -4,6 +4,7 @@ import type { Song } from '@/api/types'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingRows } from '@/components/common/LoadingRows'
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
+import { useAddSongToPlaylist, usePlaylistsQuery } from '@/features/playlists/usePlaylists'
 import { useUiStore } from '@/store/uiStore'
 import { getSongCoverArtId } from '@/utils/image'
 
@@ -35,6 +36,8 @@ export const PlaylistView = ({
     typeof window === 'undefined' ? 560 : Math.max(280, window.innerHeight - 340),
   )
   const client = useMemo(() => getNavidromeClientOrNull(), [])
+  const playlistsQuery = usePlaylistsQuery()
+  const addToPlaylist = useAddSongToPlaylist()
 
   useEffect(() => {
     const updateHeight = () => setViewportHeight(Math.max(280, window.innerHeight - 340))
@@ -93,6 +96,14 @@ export const PlaylistView = ({
           onQueueTrack={onQueueTrack}
           onOpenLyrics={onOpenLyrics}
           onRemoveTrack={onRemoveTrack}
+          playlists={playlistsQuery.data ?? []}
+          onAddToPlaylist={(playlistId, songId) => {
+            void addToPlaylist.mutateAsync({ playlistId, songId })
+          }}
+          onToggleFavorite={(song, next) => {
+            if (!client) return
+            void (next ? client.star(song.id) : client.unstar(song.id))
+          }}
         />
       ) : null}
     </section>

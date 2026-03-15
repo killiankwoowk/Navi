@@ -6,6 +6,7 @@ describe('settings store', () => {
   beforeEach(() => {
     localStorage.clear()
     useSettingsStore.setState({
+      theme: 'terminal',
       audioQuality: 'auto',
       gaplessEnabled: false,
       crossfadeSeconds: 0,
@@ -16,7 +17,7 @@ describe('settings store', () => {
       lyricsSyncOffsetMs: 0,
       lyricsFollowMode: true,
       geniusApiKeyOverride: '',
-      themeMode: 'terminal-dark',
+      themeMode: 'nothing',
       fontMode: 'jetbrains',
       analyticsEnabled: false,
     })
@@ -32,16 +33,16 @@ describe('settings store', () => {
     const store = useSettingsStore.getState()
     store.setAudioQuality('high')
     store.setDefaultSleepTimer(30)
-    store.setThemeMode('terminal-contrast')
+    store.setThemeMode('nothing')
 
     const payload = store.exportSettings()
-    useSettingsStore.setState({ audioQuality: 'auto', defaultSleepTimer: 'off', themeMode: 'terminal-dark' })
+    useSettingsStore.setState({ audioQuality: 'auto', defaultSleepTimer: 'off', themeMode: 'nothing', theme: 'nothing' })
     const result = useSettingsStore.getState().importSettings(payload)
 
     expect(result.ok).toBe(true)
     const nextState = useSettingsStore.getState()
     expect(nextState.audioQuality).toBe('high')
     expect(nextState.defaultSleepTimer).toBe(30)
-    expect(nextState.themeMode).toBe('terminal-contrast')
+    expect(nextState.themeMode).toBe('nothing')
   })
 })

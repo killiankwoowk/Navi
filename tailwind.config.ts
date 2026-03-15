@@ -7,17 +7,33 @@ export default {
     extend: {
       colors: {
         terminal: {
-          green: '#00ff9c',
-          bg: '#050807',
-          panel: '#09100d',
-          text: '#00ff9c',
-          muted: '#8b949e',
-          accent: '#00e5ff',
-          warn: '#ffc857',
+          green: '#ff3b30',
+          bg: '#0b0b0b',
+          panel: '#121212',
+          text: '#d8d8d8',
+          muted: '#6b6b6b',
+          accent: '#ff3b30',
+          warn: '#f59e0b',
+        },
+        nothing: {
+          900: '#0b0b0b',
+          800: '#121212',
+          700: '#1b1b1b',
+          600: '#222222',
+          500: '#2b2b2b',
+          400: '#3b3b3b',
+          300: '#6b6b6b',
+          200: '#9a9a9a',
+          100: '#d8d8d8',
+        },
+        accent: {
+          DEFAULT: '#ff3b30',
+          muted: '#ff6b61',
         },
       },
       fontFamily: {
-        mono: ['"JetBrains Mono"', '"Fira Code"', '"Source Code Pro"', 'monospace'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"Fira Code"', '"Source Code Pro"', 'ui-monospace', 'monospace'],
       },
       keyframes: {
         blink: {
@@ -35,6 +51,12 @@ export default {
       },
       boxShadow: {
         terminal: '0 0 0 1px rgba(0,255,156,0.35), inset 0 0 0 1px rgba(0,255,156,0.1)',
+        none: 'none',
+      },
+      borderRadius: {
+        DEFAULT: '4px',
+        sm: '6px',
+        lg: '8px',
       },
       backgroundImage: {
         'terminal-scanline':

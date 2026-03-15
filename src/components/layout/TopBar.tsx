@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Menu, Search } from 'lucide-react'
+import { LogOut, Menu, MoreVertical, Search } from 'lucide-react'
 
 import { AsciiLogo } from '@/components/common/AsciiLogo'
 import { useAuth } from '@/features/auth/useAuth'
@@ -14,12 +14,25 @@ export const TopBar = () => {
   const viewportMode = useViewportMode()
   const openSidebar = useUiStore((state) => state.openSidebar)
   const [searchInput, setSearchInput] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const q = searchInput.trim()
     navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search')
   }
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const handleClick = (event: MouseEvent) => {
+      if (!menuRef.current) return
+      if (menuRef.current.contains(event.target as Node)) return
+      setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [menuOpen])
 
   if (viewportMode === 'mobile') {
     return (
@@ -40,9 +53,50 @@ export const TopBar = () => {
             <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button" aria-label="Open search">
               <Search size={14} />
             </button>
-            <button className="terminal-button min-h-11 px-2 py-1" onClick={logout} type="button" aria-label="Logout">
-              <LogOut size={14} />
-            </button>
+            <div className="relative" ref={menuRef}>
+              <button
+                className="terminal-button min-h-11 px-2 py-1"
+                onClick={() => setMenuOpen((value) => !value)}
+                type="button"
+                aria-label="Open menu"
+              >
+                <MoreVertical size={14} />
+              </button>
+              {menuOpen ? (
+                <div className="absolute right-0 z-30 mt-2 min-w-36 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs">
+                  <button
+                    className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      navigate('/profile')
+                    }}
+                  >
+                    Profile
+                  </button>
+                  <button
+                    className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      navigate('/settings')
+                    }}
+                  >
+                    Settings
+                  </button>
+                  <button
+                    className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      logout()
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </header>
@@ -58,7 +112,6 @@ export const TopBar = () => {
         <div className="flex flex-wrap items-center justify-end gap-2">
           {viewportMode === 'desktop' ? (
             <form className="flex min-w-[240px] items-center gap-2" onSubmit={onSubmit}>
-              <span className="text-xs text-terminal-muted">$</span>
               <input
                 className="terminal-input h-9"
                 value={searchInput}
@@ -82,15 +135,45 @@ export const TopBar = () => {
               </button>
             </>
           )}
-          <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/profile')} type="button">
-            profile
-          </button>
-          <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/settings')} type="button">
-            settings
-          </button>
-          <button className="terminal-button min-h-11 px-2 py-1" onClick={logout} type="button">
-            logout
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button className="terminal-button min-h-11 px-2 py-1" onClick={() => setMenuOpen((value) => !value)} type="button">
+              <MoreVertical size={14} />
+            </button>
+            {menuOpen ? (
+              <div className="absolute right-0 z-30 mt-2 min-w-36 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs">
+                <button
+                  className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    navigate('/profile')
+                  }}
+                >
+                  Profile
+                </button>
+                <button
+                  className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    navigate('/settings')
+                  }}
+                >
+                  Settings
+                </button>
+                <button
+                  className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    logout()
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </header>

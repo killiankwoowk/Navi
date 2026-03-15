@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { FixedSizeList as List, type ListChildComponentProps } from 'react-window'
 
-import type { Song } from '@/api/types'
+import type { Playlist, Song } from '@/api/types'
 
 import { PlaylistCard } from './PlaylistCard'
+import { SongRow } from '@/components/common/SongRow'
 
 interface PlaylistGridProps {
   tracks: Song[]
@@ -14,6 +15,9 @@ interface PlaylistGridProps {
   onQueueTrack: (track: Song) => void
   onOpenLyrics: (track: Song) => void
   onRemoveTrack?: (track: Song, index: number) => void
+  playlists: Playlist[]
+  onAddToPlaylist: (playlistId: string, songId: string) => void
+  onToggleFavorite: (song: Song, next: boolean) => void
 }
 
 interface RowData {
@@ -25,6 +29,9 @@ interface RowData {
   onQueueTrack: (track: Song) => void
   onOpenLyrics: (track: Song) => void
   onRemoveTrack?: (track: Song, index: number) => void
+  playlists: Playlist[]
+  onAddToPlaylist: (playlistId: string, songId: string) => void
+  onToggleFavorite: (song: Song, next: boolean) => void
 }
 
 const listItemSize = 96
@@ -37,14 +44,14 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps<RowData>) =
     const track = data.tracks[index]
     return (
       <div style={style} className="px-1 py-1">
-        <PlaylistCard
-          track={track}
-          mode="list"
-          coverUrl={data.resolveCoverUrl(track)}
+        <SongRow
+          song={track}
+          indexLabel={track.track ?? index + 1}
+          playlists={data.playlists}
           onPlay={() => data.onPlayTrack(track, index)}
-          onQueue={() => data.onQueueTrack(track)}
-          onLyrics={() => data.onOpenLyrics(track)}
-          onRemove={data.onRemoveTrack ? () => data.onRemoveTrack?.(track, index) : undefined}
+          onQueue={data.onQueueTrack}
+          onAddToPlaylist={data.onAddToPlaylist}
+          onToggleFavorite={data.onToggleFavorite}
         />
       </div>
     )
@@ -84,6 +91,9 @@ export const PlaylistGrid = ({
   onQueueTrack,
   onOpenLyrics,
   onRemoveTrack,
+  playlists,
+  onAddToPlaylist,
+  onToggleFavorite,
 }: PlaylistGridProps) => {
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const [width, setWidth] = useState(900)
@@ -121,23 +131,38 @@ export const PlaylistGrid = ({
       onQueueTrack,
       onOpenLyrics,
       onRemoveTrack,
+      playlists,
+      onAddToPlaylist,
+      onToggleFavorite,
     }),
-    [columns, mode, onOpenLyrics, onPlayTrack, onQueueTrack, onRemoveTrack, resolveCoverUrl, tracks],
+    [
+      columns,
+      mode,
+      onAddToPlaylist,
+      onOpenLyrics,
+      onPlayTrack,
+      onQueueTrack,
+      onRemoveTrack,
+      onToggleFavorite,
+      playlists,
+      resolveCoverUrl,
+      tracks,
+    ],
   )
 
   if (!useVirtualizedList && mode === 'list') {
     return (
       <div ref={viewportRef} className="playlist-viewport max-h-[65vh] space-y-1 overflow-auto p-1">
         {tracks.map((track, index) => (
-          <PlaylistCard
+          <SongRow
             key={track.id}
-            track={track}
-            mode="list"
-            coverUrl={resolveCoverUrl(track)}
+            song={track}
+            indexLabel={track.track ?? index + 1}
+            playlists={playlists}
             onPlay={() => onPlayTrack(track, index)}
-            onQueue={() => onQueueTrack(track)}
-            onLyrics={() => onOpenLyrics(track)}
-            onRemove={onRemoveTrack ? () => onRemoveTrack(track, index) : undefined}
+            onQueue={onQueueTrack}
+            onAddToPlaylist={onAddToPlaylist}
+            onToggleFavorite={onToggleFavorite}
           />
         ))}
       </div>

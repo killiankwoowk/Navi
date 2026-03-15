@@ -23,6 +23,7 @@ describe('BottomPlayer responsive modes', () => {
       sleepTimer: { endsAt: null, durationMinutes: null },
     })
     useSettingsStore.setState({
+      theme: 'terminal',
       audioQuality: 'auto',
       gaplessEnabled: false,
       crossfadeSeconds: 0,
@@ -33,7 +34,7 @@ describe('BottomPlayer responsive modes', () => {
       lyricsSyncOffsetMs: 0,
       lyricsFollowMode: true,
       geniusApiKeyOverride: '',
-      themeMode: 'terminal-dark',
+      themeMode: 'nothing',
       fontMode: 'jetbrains',
       analyticsEnabled: false,
     })

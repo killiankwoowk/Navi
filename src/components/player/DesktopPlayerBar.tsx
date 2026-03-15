@@ -69,7 +69,7 @@ export const DesktopPlayerBar = ({
   onToggleQueue,
   warningMessage,
 }: DesktopPlayerBarProps) => (
-  <footer className="terminal-panel fixed bottom-0 left-0 right-0 z-30 mx-2 mb-2 p-2 sm:mx-3 sm:mb-3 sm:p-3">
+  <footer className="fixed bottom-0 left-0 right-0 z-30 mx-2 mb-2 rounded border border-nothing-700 bg-nothing-800 p-2 text-nothing-100 sm:mx-3 sm:mb-3 sm:p-3">
     <div className="grid gap-3 xl:grid-cols-[minmax(220px,1.05fr)_minmax(0,1.8fr)_minmax(240px,0.95fr)] xl:items-center">
       <NowPlaying track={track} coverUrl={coverUrl} />
       <div className="min-w-0 space-y-2">
@@ -86,7 +86,7 @@ export const DesktopPlayerBar = ({
           />
           <div className="flex flex-wrap items-center gap-2">
             <button
-              className={`terminal-button min-h-11 px-2 py-1 ${lyricsActive ? 'border-terminal-accent text-terminal-accent' : ''}`}
+              className={`terminal-button min-h-11 px-2 py-1 ${lyricsActive ? 'border-accent text-accent' : ''}`}
               type="button"
               onClick={onToggleLyrics}
               aria-label="Toggle lyrics panel"
@@ -95,20 +95,20 @@ export const DesktopPlayerBar = ({
               lyrics
             </button>
             <button
-              className={`terminal-button min-h-11 px-2 py-1 ${queueActive ? 'border-terminal-accent text-terminal-accent' : ''}`}
+              className={`terminal-button min-h-11 px-2 py-1 ${queueActive ? 'border-accent text-accent' : ''}`}
               type="button"
               onClick={onToggleQueue}
               aria-label="Toggle queue panel"
             >
               <ListMusic size={14} />
               queue
-              <span className="rounded-sm border border-terminal-text/40 px-1 text-[10px]">{queueLength}</span>
+              <span className="rounded-sm border border-nothing-500 px-1 text-[10px]">{queueLength}</span>
             </button>
           </div>
         </div>
         <ProgressBar progress={progress} duration={duration} onSeek={onSeek} />
         {warningMessage ? (
-          <div className="border border-terminal-warn/70 bg-terminal-warn/10 px-2 py-1 text-[11px] text-terminal-warn">
+          <div className="border border-nothing-400/70 bg-nothing-700/20 px-2 py-1 text-[11px] text-nothing-100">
             {warningMessage}
           </div>
         ) : null}
@@ -124,11 +124,11 @@ export const DesktopPlayerBar = ({
           />
           <VolumeControl volume={volume} onChange={onVolumeChange} />
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-[11px] text-terminal-muted xl:justify-end">
-          <span className="border border-terminal-text/30 px-1 uppercase tracking-[0.14em] text-terminal-accent">last.fm</span>
-          <span className="text-terminal-text">{scrobbleCount}</span>
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-nothing-300 xl:justify-end">
+          <span className="border border-nothing-500 px-1 uppercase tracking-[0.14em] text-accent">last.fm</span>
+          <span className="text-nothing-100">{scrobbleCount}</span>
         </div>
-        <div className="text-xs text-terminal-muted">
+        <div className="text-xs text-nothing-300">
           [{currentIndex + 1}/{queueLength || 0}] {track?.album ?? '--'}
         </div>
       </div>

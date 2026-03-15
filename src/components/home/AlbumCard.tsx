@@ -42,7 +42,7 @@ export const AlbumCard = ({ album, coverUrl, onPlay, onQueue, onOpen }: AlbumCar
       <div className="mt-2">
         <Link
           to={albumLink}
-          className="block truncate text-sm md:text-base text-terminal-text focus:outline-none focus:ring-2 focus:ring-terminal-green"
+          className="block truncate text-sm md:text-base text-nothing-100 focus:outline-none focus:ring-2 focus:ring-accent"
           aria-label={`Open album details for ${album.name}`}
         >
           {album.name}
@@ -50,13 +50,13 @@ export const AlbumCard = ({ album, coverUrl, onPlay, onQueue, onOpen }: AlbumCar
         {artistLink ? (
           <Link
             to={artistLink}
-            className="block truncate text-xs md:text-sm text-terminal-muted focus:outline-none focus:ring-2 focus:ring-terminal-green"
+            className="block truncate text-xs md:text-sm text-nothing-300 focus:outline-none focus:ring-2 focus:ring-accent"
             aria-label={`Open artist ${album.artist ?? 'Unknown artist'}`}
           >
             {album.artist ?? 'Unknown artist'}
           </Link>
         ) : (
-          <p className="m-0 truncate text-xs md:text-sm text-terminal-muted">{album.artist ?? 'Unknown artist'}</p>
+          <p className="m-0 truncate text-xs md:text-sm text-nothing-300">{album.artist ?? 'Unknown artist'}</p>
         )}
       </div>
       <div className="mt-2 flex items-center gap-1">

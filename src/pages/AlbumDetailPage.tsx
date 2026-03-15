@@ -5,13 +5,14 @@ import { CoverArtImage } from '@/components/common/CoverArtImage'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingRows } from '@/components/common/LoadingRows'
 import { TerminalPanel } from '@/components/common/TerminalPanel'
+import { SongRow } from '@/components/common/SongRow'
 import { getNavidromeClientOrNull } from '@/features/auth/useAuth'
 import { useAlbumQuery } from '@/features/library/useLibrary'
+import { useAddSongToPlaylist, usePlaylistsQuery } from '@/features/playlists/usePlaylists'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useViewportMode } from '@/hooks/useViewportMode'
 import { usePlayerStore } from '@/store/playerStore'
-import { useUiStore } from '@/store/uiStore'
-import { formatAlbumMeta, formatDuration } from '@/utils/format'
+import { formatAlbumMeta } from '@/utils/format'
 import { getCoverSizeForViewport } from '@/utils/image'
 
 export const AlbumDetailPage = () => {
@@ -19,9 +20,10 @@ export const AlbumDetailPage = () => {
   const albumQuery = useAlbumQuery(id)
   const setQueue = usePlayerStore((state) => state.setQueue)
   const addToQueue = usePlayerStore((state) => state.addToQueue)
-  const openLyricsPanel = useUiStore((state) => state.openLyricsPanel)
   const viewportMode = useViewportMode()
   const client = useMemo(() => getNavidromeClientOrNull(), [])
+  const playlistsQuery = usePlaylistsQuery()
+  const addToPlaylist = useAddSongToPlaylist()
 
   const album = albumQuery.data
   const tracks = useMemo(() => album?.song ?? [], [album])
@@ -91,46 +93,21 @@ export const AlbumDetailPage = () => {
             <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">tracks</h3>
             <div className="space-y-1">
               {tracks.map((song, index) => (
-                <div
+                <SongRow
                   key={song.id}
-                  className="grid grid-cols-[28px_1fr_auto] items-center gap-2 border border-terminal-text/20 px-2 py-2"
-                >
-                  <span className="text-[11px] text-terminal-muted">{song.track ?? index + 1}</span>
-                  <Link
-                    to={`/song/${song.id}`}
-                    className="truncate text-left text-sm focus:outline-none focus:ring-2 focus:ring-terminal-green"
-                    aria-label={`Open song ${song.title}`}
-                  >
-                    {song.title}
-                  </Link>
-                  <div className="flex items-center gap-1 text-[11px]">
-                    <span className="text-terminal-muted">{formatDuration(song.duration ?? 0)}</span>
-                    <button
-                      className="terminal-button min-h-11 px-1 py-0"
-                      type="button"
-                      onClick={() => setQueue(tracks, index, true)}
-                      aria-label={`Play ${song.title}`}
-                    >
-                      play
-                    </button>
-                    <button
-                      className="terminal-button min-h-11 px-1 py-0"
-                      type="button"
-                      onClick={() => addToQueue([song])}
-                      aria-label={`Add ${song.title} to queue`}
-                    >
-                      +q
-                    </button>
-                    <button
-                      className="terminal-button min-h-11 px-1 py-0"
-                      type="button"
-                      onClick={() => openLyricsPanel(song)}
-                      aria-label={`Open lyrics for ${song.title}`}
-                    >
-                      lyrics
-                    </button>
-                  </div>
-                </div>
+                  song={song}
+                  indexLabel={song.track ?? index + 1}
+                  playlists={playlistsQuery.data ?? []}
+                  onPlay={() => setQueue(tracks, index, true)}
+                  onQueue={(selected) => addToQueue([selected])}
+                  onAddToPlaylist={(playlistId, songId) => {
+                    void addToPlaylist.mutateAsync({ playlistId, songId })
+                  }}
+                  onToggleFavorite={(selected, next) => {
+                    if (!client) return
+                    void (next ? client.star(selected.id) : client.unstar(selected.id))
+                  }}
+                />
               ))}
             </div>
           </section>

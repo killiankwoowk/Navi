@@ -17,6 +17,7 @@ describe('Profile', () => {
     })
 
     useSettingsStore.setState({
+      theme: 'terminal',
       audioQuality: 'auto',
       gaplessEnabled: false,
       crossfadeSeconds: 0,
@@ -27,7 +28,7 @@ describe('Profile', () => {
       lyricsSyncOffsetMs: 0,
       lyricsFollowMode: true,
       geniusApiKeyOverride: '',
-      themeMode: 'terminal-dark',
+      themeMode: 'nothing',
       fontMode: 'jetbrains',
       analyticsEnabled: false,
     })

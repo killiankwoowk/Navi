@@ -18,13 +18,13 @@ export const NowPlaying = ({ track, coverUrl }: NowPlayingProps) => {
       {albumLink ? (
         <Link
           to={albumLink}
-          className="block focus:outline-none focus:ring-2 focus:ring-terminal-green"
+          className="block focus:outline-none focus:ring-2 focus:ring-accent"
           aria-label={`Open album ${track?.album ?? 'album'}`}
         >
           <CoverArtImage
             src={coverUrl}
             alt={track?.title ?? 'cover'}
-            className="h-14 w-14 border border-terminal-text/35 bg-black/40"
+            className="h-14 w-14 border border-nothing-600 bg-black/40"
             fallbackLabel="no art"
           />
         </Link>
@@ -32,7 +32,7 @@ export const NowPlaying = ({ track, coverUrl }: NowPlayingProps) => {
         <CoverArtImage
           src={coverUrl}
           alt={track?.title ?? 'cover'}
-          className="h-14 w-14 border border-terminal-text/35 bg-black/40"
+          className="h-14 w-14 border border-nothing-600 bg-black/40"
           fallbackLabel="no art"
         />
       )}
@@ -40,19 +40,19 @@ export const NowPlaying = ({ track, coverUrl }: NowPlayingProps) => {
         {songLink ? (
           <Link
             to={songLink}
-            className="block truncate text-sm text-terminal-text focus:outline-none focus:ring-2 focus:ring-terminal-green"
+            className="block truncate text-sm text-nothing-100 focus:outline-none focus:ring-2 focus:ring-accent"
             aria-label={`Open song ${track?.title ?? 'song'}`}
           >
             {track?.title ?? 'No track selected'}
           </Link>
         ) : (
-          <div className="truncate text-sm text-terminal-text">{track?.title ?? 'No track selected'}</div>
+          <div className="truncate text-sm text-nothing-100">{track?.title ?? 'No track selected'}</div>
         )}
-        <div className="truncate text-xs text-terminal-muted">
+        <div className="truncate text-xs text-nothing-300">
           {artistLink ? (
             <Link
               to={artistLink}
-              className="focus:outline-none focus:ring-2 focus:ring-terminal-green"
+              className="focus:outline-none focus:ring-2 focus:ring-accent"
               aria-label={`Open artist ${track?.artist ?? 'Unknown artist'}`}
             >
               {track?.artist ?? 'Unknown artist'}

@@ -12,7 +12,6 @@ export const TerminalPanel = ({ title, rightSlot, className, bodyClassName, chil
   <section className={clsx('terminal-panel', className)}>
     <header className="terminal-heading flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span className="text-terminal-accent">$</span>
         <span>{title}</span>
       </div>
       {rightSlot}

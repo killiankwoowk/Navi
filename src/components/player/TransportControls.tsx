@@ -24,7 +24,7 @@ export const TransportControls = ({
   onCycleRepeat,
 }: TransportControlsProps) => (
   <div className="flex items-center gap-2">
-    <button className={`terminal-button min-h-11 ${shuffle ? 'text-terminal-accent' : ''}`} type="button" onClick={onToggleShuffle} aria-label="Toggle shuffle">
+    <button className={`terminal-button min-h-11 ${shuffle ? 'text-accent' : ''}`} type="button" onClick={onToggleShuffle} aria-label="Toggle shuffle">
       <Shuffle size={14} />
     </button>
     <button className="terminal-button min-h-11" type="button" onClick={onPrevious} aria-label="Previous track">
@@ -37,7 +37,7 @@ export const TransportControls = ({
       <SkipForward size={14} />
     </button>
     <button
-      className={`terminal-button min-h-11 ${repeat !== 'off' ? 'text-terminal-accent' : ''}`}
+      className={`terminal-button min-h-11 ${repeat !== 'off' ? 'text-accent' : ''}`}
       type="button"
       onClick={onCycleRepeat}
       aria-label="Cycle repeat mode"

@@ -36,20 +36,20 @@ const QueueRow = ({ item, index, queueLength, active, onSelect, onRemove, onMove
       ref={setNodeRef}
       style={style}
       className={`grid grid-cols-[22px_1fr_auto_auto] items-center gap-2 border px-2 py-1 text-xs ${
-        active ? 'border-terminal-accent bg-terminal-accent/10 text-terminal-accent' : 'border-terminal-text/20'
+        active ? 'border-accent bg-nothing-700 text-accent' : 'border-nothing-600 text-nothing-100'
       }`}
     >
-      <button className="cursor-grab text-terminal-muted" type="button" aria-label={`Drag ${item.track.title}`} {...attributes} {...listeners}>
+      <button className="cursor-grab text-nothing-300" type="button" aria-label={`Drag ${item.track.title}`} {...attributes} {...listeners}>
         ::
       </button>
       <Link
         to={`/song/${item.track.id}`}
-        className="min-h-11 truncate text-left focus:outline-none focus:ring-2 focus:ring-terminal-green"
+        className="min-h-11 flex items-center justify-center truncate text-center focus:outline-none focus:ring-2 focus:ring-accent text-nothing-100"
         aria-label={`Open song ${item.track.title}`}
       >
         {item.track.title}
       </Link>
-      <span className="text-terminal-muted">{formatDuration(item.track.duration ?? 0)}</span>
+      <span className="text-nothing-300">{formatDuration(item.track.duration ?? 0)}</span>
       <div className="flex items-center gap-1">
         <button
           className="terminal-button min-h-11 px-1 py-0"

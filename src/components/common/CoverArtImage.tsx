@@ -37,11 +37,10 @@ export const CoverArtImage = ({
         />
       ) : null}
       {!shouldRenderImage || !loaded ? (
-        <div className="absolute inset-0 flex h-full w-full items-center justify-center border border-terminal-text/25 bg-black/40 text-[10px] uppercase tracking-[0.14em] text-terminal-muted">
+        <div className="absolute inset-0 flex h-full w-full items-center justify-center border border-nothing-700 bg-black/40 text-[10px] uppercase tracking-[0.14em] text-nothing-300">
           {fallbackLabel}
         </div>
       ) : null}
     </div>
   )
 }
-

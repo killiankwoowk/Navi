@@ -93,7 +93,7 @@ export interface Search3Result {
 export type RepeatMode = 'off' | 'all' | 'one'
 export type AudioQuality = 'auto' | 'low' | 'medium' | 'high'
 export type LyricsSource = 'auto' | 'genius' | 'local'
-export type ThemeMode = 'terminal-dark' | 'terminal-contrast'
+export type ThemeMode = 'nothing'
 export type FontMode = 'jetbrains' | 'fira'
 export type SleepTimerDefault = 'off' | 15 | 30 | 60
 export type ViewportMode = 'mobile' | 'tablet' | 'desktop'
@@ -177,6 +177,8 @@ export interface NavidromeClient {
   getPlaylist: (id: string) => Promise<Playlist>
   createPlaylist: (name: string, songIds?: string[]) => Promise<Playlist>
   updatePlaylist: (input: UpdatePlaylistInput) => Promise<void>
+  star: (songId: string) => Promise<void>
+  unstar: (songId: string) => Promise<void>
   scrobble: (songId: string, submission?: boolean) => Promise<void>
   streamViewUrl: (songId: string, opts?: StreamOptions) => string
   getStreamUrl: (songId: string, opts?: StreamOptions) => string

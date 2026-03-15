@@ -3,7 +3,10 @@ import { persist } from 'zustand/middleware'
 
 import type { AudioQuality, FontMode, LyricsSource, SleepTimerDefault, ThemeMode } from '@/api/types'
 
+type Theme = 'terminal' | 'nothing'
+
 interface SettingsSnapshot {
+  theme: Theme
   audioQuality: AudioQuality
   gaplessEnabled: boolean
   crossfadeSeconds: number
@@ -20,6 +23,7 @@ interface SettingsSnapshot {
 }
 
 interface SettingsState extends SettingsSnapshot {
+  setTheme: (theme: Theme) => void
   setAudioQuality: (quality: AudioQuality) => void
   setGaplessEnabled: (enabled: boolean) => void
   setCrossfadeSeconds: (seconds: number) => void
@@ -54,6 +58,7 @@ const parseSleepTimer = (value: unknown): SleepTimerDefault => {
 }
 
 const initialSnapshot: SettingsSnapshot = {
+  theme: 'terminal',
   audioQuality: defaultQualityFromEnv(),
   gaplessEnabled: false,
   crossfadeSeconds: 0,
@@ -64,12 +69,13 @@ const initialSnapshot: SettingsSnapshot = {
   lyricsSyncOffsetMs: 0,
   lyricsFollowMode: true,
   geniusApiKeyOverride: '',
-  themeMode: 'terminal-dark',
+  themeMode: 'nothing',
   fontMode: 'jetbrains',
   analyticsEnabled: false,
 }
 
 const getPersistedSnapshot = (state: SettingsState): SettingsSnapshot => ({
+  theme: state.theme,
   audioQuality: state.audioQuality,
   gaplessEnabled: state.gaplessEnabled,
   crossfadeSeconds: state.crossfadeSeconds,
@@ -90,6 +96,8 @@ const normalizeImportedSettings = (input: unknown): Partial<SettingsSnapshot> =>
   const raw = input as Record<string, unknown>
   const next: Partial<SettingsSnapshot> = {}
 
+  if (raw.theme === 'terminal' || raw.theme === 'nothing') next.theme = raw.theme
+
   if (raw.audioQuality === 'auto' || raw.audioQuality === 'low' || raw.audioQuality === 'medium' || raw.audioQuality === 'high') {
     next.audioQuality = raw.audioQuality
   }
@@ -109,7 +117,7 @@ const normalizeImportedSettings = (input: unknown): Partial<SettingsSnapshot> =>
   if (typeof raw.lyricsFollowMode === 'boolean') next.lyricsFollowMode = raw.lyricsFollowMode
   if (typeof raw.geniusApiKeyOverride === 'string') next.geniusApiKeyOverride = raw.geniusApiKeyOverride
 
-  if (raw.themeMode === 'terminal-dark' || raw.themeMode === 'terminal-contrast') next.themeMode = raw.themeMode
+  if (raw.themeMode === 'nothing') next.themeMode = raw.themeMode
   if (raw.fontMode === 'jetbrains' || raw.fontMode === 'fira') next.fontMode = raw.fontMode
   if (typeof raw.analyticsEnabled === 'boolean') next.analyticsEnabled = raw.analyticsEnabled
 
@@ -120,6 +128,11 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
       ...initialSnapshot,
+      setTheme: (theme) =>
+        set(() => ({
+          theme,
+          themeMode: 'nothing',
+        })),
       setAudioQuality: (audioQuality) => set({ audioQuality }),
       setGaplessEnabled: (gaplessEnabled) => set({ gaplessEnabled }),
       setCrossfadeSeconds: (crossfadeSeconds) => set({ crossfadeSeconds: clamp(crossfadeSeconds, 0, 12) }),
@@ -131,7 +144,11 @@ export const useSettingsStore = create<SettingsState>()(
       setLyricsFollowMode: (lyricsFollowMode) => set({ lyricsFollowMode }),
       setGeniusApiKeyOverride: (geniusApiKeyOverride) => set({ geniusApiKeyOverride: geniusApiKeyOverride.trim() }),
       clearGeniusApiKey: () => set({ geniusApiKeyOverride: '' }),
-      setThemeMode: (themeMode) => set({ themeMode }),
+      setThemeMode: () =>
+        set({
+          themeMode: 'nothing',
+          theme: 'nothing',
+        }),
       setFontMode: (fontMode) => set({ fontMode }),
       setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
       exportSettings: () => JSON.stringify(getPersistedSnapshot(get()), null, 2),
@@ -155,6 +172,7 @@ export const useSettingsStore = create<SettingsState>()(
         return {
           ...initialSnapshot,
           ...normalized,
+          theme: normalized.theme ?? 'nothing',
         }
       },
       partialize: (state) => getPersistedSnapshot(state),

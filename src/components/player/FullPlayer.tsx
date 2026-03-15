@@ -68,9 +68,9 @@ export const FullPlayer = ({
         if (endY - startY > 80) onClose()
       }}
     >
-      <div className="terminal-panel flex h-full flex-col p-3">
+      <div className="flex h-full flex-col rounded border border-nothing-700 bg-nothing-800 p-3 text-nothing-100">
         <div className="flex items-center justify-between">
-          <span className="text-xs uppercase tracking-[0.14em] text-terminal-muted">Now Playing</span>
+          <span className="text-xs uppercase tracking-[0.14em] text-nothing-300">Now Playing</span>
           <button className="terminal-button min-h-11 px-2 py-1" type="button" onClick={onClose} aria-label="Minimize player">
             <ChevronDown size={14} />
           </button>
@@ -79,18 +79,18 @@ export const FullPlayer = ({
           <CoverArtImage
             src={coverUrl}
             alt={track?.title ?? 'cover art'}
-            className="mx-auto w-full max-w-sm overflow-hidden border border-terminal-text/30"
+            className="mx-auto w-full max-w-sm overflow-hidden border border-nothing-700"
             imageClassName="aspect-square"
           />
           <div className="text-center">
-            <h2 className="m-0 truncate text-lg text-terminal-text">{track?.title ?? 'No track selected'}</h2>
-            <p className="m-0 truncate text-sm text-terminal-muted">{track?.artist ?? 'Unknown artist'}</p>
+            <h2 className="m-0 truncate text-lg text-nothing-100">{track?.title ?? 'No track selected'}</h2>
+            <p className="m-0 truncate text-sm text-nothing-300">{track?.artist ?? 'Unknown artist'}</p>
           </div>
           <ProgressBar progress={progress} duration={duration} onSeek={onSeek} />
           <div className="flex justify-center">
-            <div className="flex items-center gap-2 text-[11px] text-terminal-muted">
-              <span className="border border-terminal-text/30 px-1 uppercase tracking-[0.14em] text-terminal-accent">last.fm</span>
-              <span className="text-terminal-text">{scrobbleCount}</span>
+            <div className="flex items-center gap-2 text-[11px] text-nothing-300">
+              <span className="border border-nothing-500 px-1 uppercase tracking-[0.14em] text-accent">last.fm</span>
+              <span className="text-nothing-100">{scrobbleCount}</span>
             </div>
           </div>
           <div className="flex justify-center">

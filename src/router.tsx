@@ -23,7 +23,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((module) => 
 
 const PageLoader = () => (
   <div className="terminal-grid min-h-screen p-6">
-    <div className="terminal-panel p-4 text-sm text-terminal-muted">$ loading...</div>
+    <div className="terminal-panel p-4 text-sm text-nothing-300">loading...</div>
   </div>
 )
 

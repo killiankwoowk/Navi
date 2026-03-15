@@ -7,7 +7,7 @@ export const LoadingRows = ({ rows = 8 }: LoadingRowsProps) => (
     {Array.from({ length: rows }).map((_, index) => (
       <div
         key={`loading-row-${index}`}
-        className="h-9 animate-pulse border border-terminal-text/20 bg-terminal-text/5"
+        className="h-9 animate-pulse border border-nothing-700 bg-nothing-800"
       />
     ))}
   </div>
