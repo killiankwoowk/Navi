@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
 import type { Album } from '@/api/types'
@@ -28,6 +29,14 @@ export const HomeDashboard = () => {
   const topAlbums = useAlbumListQuery('frequent', 40, 0)
   const suggestedAlbums = useAlbumListQuery('alphabeticalByName', 40, 0)
   const playlists = usePlaylistsQuery()
+  const recentSongsQuery = useQuery({
+    queryKey: ['recent-songs', 20],
+    queryFn: async () => {
+      if (!client) return []
+      return client.getRecentSongs(20)
+    },
+    staleTime: 5 * 60_000,
+  })
 
   const coverUrlForAlbum = useCallback(
     (album: Album, size = coverSize) => {
@@ -54,6 +63,21 @@ export const HomeDashboard = () => {
   )
 
   const featuredAlbums = useMemo(() => (recentlyAdded.data ?? []).slice(0, 8), [recentlyAdded.data])
+  const recentAlbums = useMemo(() => {
+    const map = new Map<string, Album>()
+    for (const song of recentSongsQuery.data ?? []) {
+      if (!song.albumId) continue
+      if (map.has(song.albumId)) continue
+      map.set(song.albumId, {
+        id: song.albumId,
+        name: song.album ?? 'Unknown album',
+        artist: song.artist ?? 'Unknown artist',
+        artistId: song.artistId,
+        coverArt: song.coverArt ?? song.albumId,
+      })
+    }
+    return Array.from(map.values())
+  }, [recentSongsQuery.data])
   const mainFeed = useMemo(() => {
     const map = new Map<string, Album>()
     for (const album of [...(recentlyAdded.data ?? []), ...(topAlbums.data ?? []), ...(suggestedAlbums.data ?? [])]) {
@@ -88,6 +112,22 @@ export const HomeDashboard = () => {
             ))}
           </div>
         </section>
+      ) : null}
+
+      {recentAlbums.length > 0 ? (
+        <CarouselRow title="Recently Played">
+          {recentAlbums.map((album) => (
+            <div key={`recent-played-${album.id}`} className="min-w-[170px] max-w-[190px]">
+              <AlbumCard
+                album={album}
+                coverUrl={coverUrlForAlbum(album)}
+                onPlay={() => playAlbum(album)}
+                onQueue={() => playAlbum(album, true)}
+                onOpen={() => navigate(`/album/${album.id}`)}
+              />
+            </div>
+          ))}
+        </CarouselRow>
       ) : null}
 
       <CarouselRow title="Recently Added">

@@ -70,10 +70,10 @@ export const DesktopPlayerBar = ({
   warningMessage,
 }: DesktopPlayerBarProps) => (
   <footer className="fixed bottom-0 left-0 right-0 z-30 mx-2 mb-2 rounded border border-nothing-700 bg-nothing-800 p-2 text-nothing-100 sm:mx-3 sm:mb-3 sm:p-3">
-    <div className="grid gap-3 xl:grid-cols-[minmax(220px,1.05fr)_minmax(0,1.8fr)_minmax(240px,0.95fr)] xl:items-center">
+    <div className="grid gap-3 lg:grid-cols-[minmax(220px,1.05fr)_minmax(0,1.8fr)_minmax(240px,0.95fr)] lg:items-center">
       <NowPlaying track={track} coverUrl={coverUrl} />
       <div className="min-w-0 space-y-2">
-        <div className="flex flex-col gap-2 2xl:flex-row 2xl:items-center 2xl:justify-between">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
           <TransportControls
             isPlaying={isPlaying}
             shuffle={shuffle}
@@ -107,14 +107,7 @@ export const DesktopPlayerBar = ({
           </div>
         </div>
         <ProgressBar progress={progress} duration={duration} onSeek={onSeek} />
-        {warningMessage ? (
-          <div className="border border-nothing-400/70 bg-nothing-700/20 px-2 py-1 text-[11px] text-nothing-100">
-            {warningMessage}
-          </div>
-        ) : null}
-      </div>
-      <div className="flex min-w-0 flex-col gap-2 xl:items-end xl:text-right">
-        <div className="flex flex-wrap items-center justify-between gap-2 xl:justify-end">
+        <div className="flex flex-wrap items-center justify-between gap-2 lg:hidden">
           <SleepTimerControl
             endsAt={sleepEndsAt}
             durationMinutes={sleepDurationMinutes}
@@ -124,7 +117,24 @@ export const DesktopPlayerBar = ({
           />
           <VolumeControl volume={volume} onChange={onVolumeChange} />
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-[11px] text-nothing-300 xl:justify-end">
+        {warningMessage ? (
+          <div className="border border-nothing-400/70 bg-nothing-700/20 px-2 py-1 text-[11px] text-nothing-100">
+            {warningMessage}
+          </div>
+        ) : null}
+      </div>
+      <div className="hidden min-w-0 flex-col gap-2 lg:flex lg:items-end lg:text-right">
+        <div className="flex flex-wrap items-center justify-between gap-2 lg:justify-end">
+          <SleepTimerControl
+            endsAt={sleepEndsAt}
+            durationMinutes={sleepDurationMinutes}
+            defaultDuration={defaultSleepTimer}
+            onSetTimer={onSetSleepTimer}
+            onCancel={onCancelSleepTimer}
+          />
+          <VolumeControl volume={volume} onChange={onVolumeChange} />
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-nothing-300 lg:justify-end">
           <span className="border border-nothing-500 px-1 uppercase tracking-[0.14em] text-accent">last.fm</span>
           <span className="text-nothing-100">{scrobbleCount}</span>
         </div>

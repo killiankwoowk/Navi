@@ -18,7 +18,7 @@ export const ResponsiveLayout = ({
 }: ResponsiveLayoutProps) => {
   if (viewportMode === 'mobile') {
     return (
-      <main className="flex-1 min-h-0 overflow-auto px-2 py-2 pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
+      <main className="app-scroll flex-1 min-h-0 overflow-auto px-2 py-2 pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
         <div className="space-y-3">{children}</div>
       </main>
     )
@@ -26,7 +26,7 @@ export const ResponsiveLayout = ({
 
   if (viewportMode === 'tablet') {
     return (
-      <main className="flex-1 min-h-0 overflow-auto px-3 py-3 pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
+      <main className="app-scroll flex-1 min-h-0 overflow-auto px-3 py-3 pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
         <div className="space-y-3">{children}</div>
       </main>
     )
@@ -43,7 +43,7 @@ export const ResponsiveLayout = ({
   return (
     <div className={`grid h-full min-h-0 gap-3 px-3 py-3 ${gridCols}`}>
       {desktopSidebar}
-      <main className="min-h-0 overflow-auto pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
+      <main className="app-scroll min-h-0 overflow-auto pb-[calc(var(--footer-height)+env(safe-area-inset-bottom))]">
         <div className="space-y-3">{children}</div>
       </main>
       {queueDock}

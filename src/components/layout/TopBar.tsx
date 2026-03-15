@@ -1,40 +1,40 @@
-import type { FormEvent } from 'react'
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { LogOut, Menu, MoreVertical, Search } from 'lucide-react'
+import type { FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Menu, MoreVertical, Search } from "lucide-react";
 
-import { AsciiLogo } from '@/components/common/AsciiLogo'
-import { useAuth } from '@/features/auth/useAuth'
-import { useViewportMode } from '@/hooks/useViewportMode'
-import { useUiStore } from '@/store/uiStore'
+import { AsciiLogo } from "@/components/common/AsciiLogo";
+import { useAuth } from "@/features/auth/useAuth";
+import { useViewportMode } from "@/hooks/useViewportMode";
+import { useUiStore } from "@/store/uiStore";
 
 export const TopBar = () => {
-  const navigate = useNavigate()
-  const { logout } = useAuth()
-  const viewportMode = useViewportMode()
-  const openSidebar = useUiStore((state) => state.openSidebar)
-  const [searchInput, setSearchInput] = useState('')
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const viewportMode = useViewportMode();
+  const openSidebar = useUiStore((state) => state.openSidebar);
+  const [searchInput, setSearchInput] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const q = searchInput.trim()
-    navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search')
-  }
+    event.preventDefault();
+    const q = searchInput.trim();
+    navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
 
   useEffect(() => {
-    if (!menuOpen) return
+    if (!menuOpen) return;
     const handleClick = (event: MouseEvent) => {
-      if (!menuRef.current) return
-      if (menuRef.current.contains(event.target as Node)) return
-      setMenuOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [menuOpen])
+      if (!menuRef.current) return;
+      if (menuRef.current.contains(event.target as Node)) return;
+      setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
 
-  if (viewportMode === 'mobile') {
+  if (viewportMode === "mobile") {
     return (
       <header className="terminal-panel mx-2 mt-2">
         <div className="flex items-center justify-between px-3 py-2">
@@ -47,10 +47,17 @@ export const TopBar = () => {
             >
               <Menu size={14} />
             </button>
-            <div className="text-xs uppercase tracking-[0.16em] text-terminal-accent">Navi Terminal</div>
+            <div className="text-xs uppercase tracking-[0.16em] text-terminal-accent">
+              Kachalar
+            </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button" aria-label="Open search">
+            <button
+              className="terminal-button min-h-11 px-2 py-1"
+              onClick={() => navigate("/search")}
+              type="button"
+              aria-label="Open search"
+            >
               <Search size={14} />
             </button>
             <div className="relative" ref={menuRef}>
@@ -68,8 +75,8 @@ export const TopBar = () => {
                     className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
                     type="button"
                     onClick={() => {
-                      setMenuOpen(false)
-                      navigate('/profile')
+                      setMenuOpen(false);
+                      navigate("/profile");
                     }}
                   >
                     Profile
@@ -78,8 +85,8 @@ export const TopBar = () => {
                     className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
                     type="button"
                     onClick={() => {
-                      setMenuOpen(false)
-                      navigate('/settings')
+                      setMenuOpen(false);
+                      navigate("/settings");
                     }}
                   >
                     Settings
@@ -88,8 +95,8 @@ export const TopBar = () => {
                     className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
                     type="button"
                     onClick={() => {
-                      setMenuOpen(false)
-                      logout()
+                      setMenuOpen(false);
+                      logout();
                     }}
                   >
                     Logout
@@ -100,7 +107,7 @@ export const TopBar = () => {
           </div>
         </div>
       </header>
-    )
+    );
   }
 
   return (
@@ -110,8 +117,11 @@ export const TopBar = () => {
           <AsciiLogo />
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          {viewportMode === 'desktop' ? (
-            <form className="flex min-w-[240px] items-center gap-2" onSubmit={onSubmit}>
+          {viewportMode === "desktop" ? (
+            <form
+              className="flex min-w-[240px] items-center gap-2"
+              onSubmit={onSubmit}
+            >
               <input
                 className="terminal-input h-9"
                 value={searchInput}
@@ -120,23 +130,36 @@ export const TopBar = () => {
                 aria-label="Global search"
               />
               <button className="terminal-button h-9" type="submit">
-                run
+                Search
               </button>
             </form>
           ) : (
             <>
-              <button className="terminal-button min-h-11 px-2 py-1" onClick={openSidebar} type="button" aria-label="Open navigation">
+              <button
+                className="terminal-button min-h-11 px-2 py-1"
+                onClick={openSidebar}
+                type="button"
+                aria-label="Open navigation"
+              >
                 <Menu size={14} />
                 menu
               </button>
-              <button className="terminal-button min-h-11 px-2 py-1" onClick={() => navigate('/search')} type="button">
+              <button
+                className="terminal-button min-h-11 px-2 py-1"
+                onClick={() => navigate("/search")}
+                type="button"
+              >
                 <Search size={14} />
                 search
               </button>
             </>
           )}
           <div className="relative" ref={menuRef}>
-            <button className="terminal-button min-h-11 px-2 py-1" onClick={() => setMenuOpen((value) => !value)} type="button">
+            <button
+              className="terminal-button min-h-11 px-2 py-1"
+              onClick={() => setMenuOpen((value) => !value)}
+              type="button"
+            >
               <MoreVertical size={14} />
             </button>
             {menuOpen ? (
@@ -145,8 +168,8 @@ export const TopBar = () => {
                   className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
                   type="button"
                   onClick={() => {
-                    setMenuOpen(false)
-                    navigate('/profile')
+                    setMenuOpen(false);
+                    navigate("/profile");
                   }}
                 >
                   Profile
@@ -155,8 +178,8 @@ export const TopBar = () => {
                   className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
                   type="button"
                   onClick={() => {
-                    setMenuOpen(false)
-                    navigate('/settings')
+                    setMenuOpen(false);
+                    navigate("/settings");
                   }}
                 >
                   Settings
@@ -165,8 +188,8 @@ export const TopBar = () => {
                   className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
                   type="button"
                   onClick={() => {
-                    setMenuOpen(false)
-                    logout()
+                    setMenuOpen(false);
+                    logout();
                   }}
                 >
                   Logout
@@ -177,5 +200,5 @@ export const TopBar = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};

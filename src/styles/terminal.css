@@ -1,6 +1,7 @@
 .terminal-grid {
   position: relative;
   isolation: isolate;
+  height: 100dvh;
 }
 
 .terminal-grid::before {
