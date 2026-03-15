@@ -13,7 +13,7 @@ const LOGO = [
 ].join("\n");
 
 export const AsciiLogo = () => (
-  <pre className="m-0 whitespace-pre-wrap text-[9px] leading-[1.1] text-nothing-100 sm:text-[10px]">
+  <pre className="m-0 whitespace-pre-wrap text-[8px] leading-[1.0] text-nothing-100 sm:text-[6px]">
     {LOGO}
   </pre>
 );

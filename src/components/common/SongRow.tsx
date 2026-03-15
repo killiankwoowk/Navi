@@ -73,7 +73,7 @@ export const SongRow = ({ song, indexLabel, playlists, onQueue, onPlay, onAddToP
           <MoreVertical size={14} />
         </button>
         {menuOpen ? (
-          <div className="absolute right-0 z-30 mt-2 w-44 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs">
+          <div className="absolute right-0 z-30 mt-2 w-44 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs shadow-lg">
             <button
               type="button"
               className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
@@ -100,13 +100,14 @@ export const SongRow = ({ song, indexLabel, playlists, onQueue, onPlay, onAddToP
                     <button
                       key={playlist.id}
                       type="button"
-                      className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                      className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
                       onClick={() => {
                         onAddToPlaylist(playlist.id, song.id)
                         setMenuOpen(false)
                         setShowPlaylists(false)
                       }}
                     >
+                      <ListPlus size={12} />
                       {playlist.name}
                     </button>
                   ))

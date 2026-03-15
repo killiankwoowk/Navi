@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, MoreVertical, Search } from "lucide-react";
+import { LogOut, Menu, MoreVertical, Search, Settings, User } from "lucide-react";
 
 import { AsciiLogo } from "@/components/common/AsciiLogo";
 import { useAuth } from "@/features/auth/useAuth";
@@ -70,35 +70,38 @@ export const TopBar = () => {
                 <MoreVertical size={14} />
               </button>
               {menuOpen ? (
-                <div className="absolute right-0 z-30 mt-2 min-w-36 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs">
+                <div className="absolute right-0 z-30 mt-2 min-w-44 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs shadow-lg">
                   <button
-                    className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                    className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
                     type="button"
                     onClick={() => {
                       setMenuOpen(false);
                       navigate("/profile");
                     }}
                   >
+                    <User size={14} />
                     Profile
                   </button>
                   <button
-                    className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                    className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
                     type="button"
                     onClick={() => {
                       setMenuOpen(false);
                       navigate("/settings");
                     }}
                   >
+                    <Settings size={14} />
                     Settings
                   </button>
                   <button
-                    className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                    className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
                     type="button"
                     onClick={() => {
                       setMenuOpen(false);
                       logout();
                     }}
                   >
+                    <LogOut size={14} />
                     Logout
                   </button>
                 </div>
@@ -163,35 +166,38 @@ export const TopBar = () => {
               <MoreVertical size={14} />
             </button>
             {menuOpen ? (
-              <div className="absolute right-0 z-30 mt-2 min-w-36 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs">
+              <div className="absolute right-0 z-30 mt-2 min-w-44 rounded border border-nothing-700 bg-nothing-800 p-1 text-xs shadow-lg">
                 <button
-                  className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                  className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                     navigate("/profile");
                   }}
                 >
+                  <User size={14} />
                   Profile
                 </button>
                 <button
-                  className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                  className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                     navigate("/settings");
                   }}
                 >
+                  <Settings size={14} />
                   Settings
                 </button>
                 <button
-                  className="block w-full rounded px-2 py-1 text-left hover:bg-nothing-700"
+                  className="flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-nothing-700"
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                     logout();
                   }}
                 >
+                  <LogOut size={14} />
                   Logout
                 </button>
               </div>

@@ -21,13 +21,13 @@ export const DesktopSidebar = ({ collapsed, onToggleCollapsed }: DesktopSidebarP
         {collapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
       </button>
     </div>
-    <nav className={`space-y-1 p-2 text-xs uppercase tracking-[0.15em] ${collapsed ? 'px-1' : ''}`}>
+    <nav className={`space-y-1 p-2 text-xs uppercase tracking-[0.15em] text-center ${collapsed ? 'px-1' : ''}`}>
       {desktopNavItems.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
           className={({ isActive }) =>
-            `flex min-h-11 items-center gap-2 border px-2 py-2 transition-colors duration-fast ${
+            `flex min-h-11 items-center justify-center gap-2 border px-2 py-2 text-center transition-colors duration-fast ${
               isActive
                 ? 'border-terminal-accent bg-terminal-accent/10 text-terminal-accent'
                 : 'border-terminal-text/15 text-terminal-muted hover:border-terminal-text/45 hover:text-terminal-text'
