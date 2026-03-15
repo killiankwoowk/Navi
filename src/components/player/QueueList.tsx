@@ -1,6 +1,7 @@
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { Link } from 'react-router-dom'
 
 import type { QueueItem } from '@/api/types'
 import { formatDuration } from '@/utils/format'
@@ -41,11 +42,23 @@ const QueueRow = ({ item, index, queueLength, active, onSelect, onRemove, onMove
       <button className="cursor-grab text-terminal-muted" type="button" aria-label={`Drag ${item.track.title}`} {...attributes} {...listeners}>
         ::
       </button>
-      <button className="min-h-11 truncate text-left" type="button" onClick={() => onSelect(index)} aria-label={`Play ${item.track.title}`}>
+      <Link
+        to={`/song/${item.track.id}`}
+        className="min-h-11 truncate text-left focus:outline-none focus:ring-2 focus:ring-terminal-green"
+        aria-label={`Open song ${item.track.title}`}
+      >
         {item.track.title}
-      </button>
+      </Link>
       <span className="text-terminal-muted">{formatDuration(item.track.duration ?? 0)}</span>
       <div className="flex items-center gap-1">
+        <button
+          className="terminal-button min-h-11 px-1 py-0"
+          type="button"
+          onClick={() => onSelect(index)}
+          aria-label={`Play ${item.track.title}`}
+        >
+          play
+        </button>
         <button className="terminal-button min-h-11 px-1 py-0" type="button" onClick={() => onMove(index, Math.max(0, index - 1))}>
           up
         </button>
@@ -99,4 +112,3 @@ export const QueueList = ({ queue, currentTrackId, onSelect, onRemove, onMove }:
     </DndContext>
   )
 }
-

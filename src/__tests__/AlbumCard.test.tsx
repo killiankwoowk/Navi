@@ -1,19 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { Album } from '@/api/types'
 import { AlbumCard } from '@/components/home/AlbumCard'
-
-const mockNavigate = vi.fn()
-
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom')
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  }
-})
 
 describe('AlbumCard', () => {
   const album: Album = {
@@ -22,34 +13,31 @@ describe('AlbumCard', () => {
     artist: 'Terminal Echo',
   }
 
-  beforeEach(() => {
-    mockNavigate.mockReset()
-  })
+  it('renders album links for cover and title', () => {
+    render(
+      <MemoryRouter>
+        <AlbumCard album={album} onPlay={vi.fn()} onQueue={vi.fn()} />
+      </MemoryRouter>,
+    )
 
-  it('navigates to album page when cover is clicked', async () => {
-    const user = userEvent.setup()
-    render(<AlbumCard album={album} onPlay={vi.fn()} onQueue={vi.fn()} />)
-
-    await user.click(screen.getByRole('button', { name: `Open album ${album.name}` }))
-    expect(mockNavigate).toHaveBeenCalledWith(`/album/${album.id}`)
+    const coverLink = screen.getByRole('link', { name: `Open album ${album.name}` })
+    const titleLink = screen.getByRole('link', { name: `Open album details for ${album.name}` })
+    expect(coverLink).toHaveAttribute('href', `/album/${album.id}`)
+    expect(titleLink).toHaveAttribute('href', `/album/${album.id}`)
   })
 
   it('play action does not trigger navigation', async () => {
     const user = userEvent.setup()
     const playSpy = vi.fn()
-    render(<AlbumCard album={album} onPlay={playSpy} onQueue={vi.fn()} />)
+    const openSpy = vi.fn()
+    render(
+      <MemoryRouter>
+        <AlbumCard album={album} onPlay={playSpy} onQueue={vi.fn()} onOpen={openSpy} />
+      </MemoryRouter>,
+    )
 
     await user.click(screen.getByRole('button', { name: `Play album ${album.name}` }))
     expect(playSpy).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).not.toHaveBeenCalled()
-  })
-
-  it('supports keyboard activation on cover button', async () => {
-    const user = userEvent.setup()
-    render(<AlbumCard album={album} onPlay={vi.fn()} onQueue={vi.fn()} />)
-    const coverButton = screen.getByRole('button', { name: `Open album ${album.name}` })
-    coverButton.focus()
-    await user.keyboard('{Enter}')
-    expect(mockNavigate).toHaveBeenCalledWith(`/album/${album.id}`)
+    expect(openSpy).not.toHaveBeenCalled()
   })
 })

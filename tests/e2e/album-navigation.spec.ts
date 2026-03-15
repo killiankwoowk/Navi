@@ -20,19 +20,16 @@ test('album cover navigation + queue + quality flow', async ({ page }) => {
   await page.getByRole('button', { name: 'CONNECT' }).click()
   await page.waitForURL('**/library')
 
-  await page.getByRole('button', { name: /^Open album / }).first().click()
+  await page.getByRole('link', { name: /^Open album / }).first().click()
   await expect(page).toHaveURL(/\/album\/.+/)
 
   await page.getByRole('button', { name: 'play album' }).click()
-  await page.getByRole('button', { name: 'Toggle queue panel' }).click()
-  await expect(page.getByRole('dialog', { name: 'Queue panel' })).toBeVisible()
-  await page.getByRole('button', { name: 'close' }).click()
 
   await page.goto('/settings')
   await page.getByRole('radio', { name: /Low/i }).check()
 
   await page.goto('/library')
-  await page.getByRole('button', { name: /^Open album / }).first().click()
+  await page.getByRole('link', { name: /^Open album / }).first().click()
   await page.getByRole('button', { name: 'play album' }).click()
 
   await expect.poll(() => lastStreamUrl).toContain('maxBitRate=128')

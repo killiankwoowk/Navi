@@ -116,11 +116,23 @@ export const SearchPage = () => {
               <h3 className="m-0 text-xs uppercase tracking-[0.15em] text-terminal-muted">songs</h3>
               {songs.map((song, index) => (
                 <div key={song.id} className="grid grid-cols-[1fr_auto] items-center gap-1 border border-terminal-text/25 px-2 py-1">
-                  <button className="min-h-11 truncate text-left text-sm" type="button" onClick={() => setQueue(songs, index, true)}>
+                  <Link
+                    to={`/song/${song.id}`}
+                    className="min-h-11 truncate text-left text-sm focus:outline-none focus:ring-2 focus:ring-terminal-green"
+                    aria-label={`Open song ${song.title}`}
+                  >
                     {song.title}
-                  </button>
+                  </Link>
                   <div className="flex items-center gap-1 text-[11px]">
                     <span className="text-terminal-muted">{formatDuration(song.duration ?? 0)}</span>
+                    <button
+                      className="terminal-button min-h-11 px-1 py-0"
+                      type="button"
+                      onClick={() => setQueue(songs, index, true)}
+                      aria-label={`Play ${song.title}`}
+                    >
+                      play
+                    </button>
                     <button className="terminal-button min-h-11 px-1 py-0" type="button" onClick={() => addToQueue([song])}>
                       +q
                     </button>
@@ -135,4 +147,3 @@ export const SearchPage = () => {
     </TerminalPanel>
   )
 }
-

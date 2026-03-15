@@ -1,4 +1,5 @@
 import { type MouseEvent, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { MessageSquareMore, Play, Plus } from 'lucide-react'
 
 import type { Song } from '@/api/types'
@@ -41,6 +42,9 @@ export const PlaylistCard = ({
   const [isCoverLoaded, setIsCoverLoaded] = useState(false)
   const [imageFailed, setImageFailed] = useState(false)
   const artistLabel = useMemo(() => track.artist ?? 'Unknown artist', [track.artist])
+  const songLink = `/song/${track.id}`
+  const artistLink = track.artistId ? `/artist/${track.artistId}` : null
+  const coverLink = track.albumId ? `/album/${track.albumId}` : songLink
 
   const coverContent = coverUrl && !imageFailed ? (
     <img
@@ -60,10 +64,32 @@ export const PlaylistCard = ({
   if (mode === 'list') {
     return (
       <article className="terminal-card grid grid-cols-[56px_1fr_auto] items-center gap-2 p-2">
-        <div className={`playlist-cover h-14 w-14 ${isCoverLoaded ? '' : 'is-loading'}`}>{coverContent}</div>
+        <Link
+          to={coverLink}
+          className={`playlist-cover h-14 w-14 focus:outline-none focus:ring-2 focus:ring-terminal-green ${isCoverLoaded ? '' : 'is-loading'}`}
+          aria-label={`Open ${track.title}`}
+        >
+          {coverContent}
+        </Link>
         <div className="min-w-0">
-          <p className="m-0 truncate text-sm text-terminal-text">{track.title}</p>
-          <p className="m-0 truncate text-xs text-terminal-muted">{artistLabel}</p>
+          <Link
+            to={songLink}
+            className="block truncate text-sm text-terminal-text focus:outline-none focus:ring-2 focus:ring-terminal-green"
+            aria-label={`Open song ${track.title}`}
+          >
+            {track.title}
+          </Link>
+          {artistLink ? (
+            <Link
+              to={artistLink}
+              className="block truncate text-xs text-terminal-muted focus:outline-none focus:ring-2 focus:ring-terminal-green"
+              aria-label={`Open artist ${artistLabel}`}
+            >
+              {artistLabel}
+            </Link>
+          ) : (
+            <p className="m-0 truncate text-xs text-terminal-muted">{artistLabel}</p>
+          )}
         </div>
         <div className="flex items-center gap-1 text-[11px]">
           <span className="text-terminal-muted">{formatDuration(track.duration ?? 0)}</span>
@@ -128,10 +154,32 @@ export const PlaylistCard = ({
 
   return (
     <article className="terminal-card p-2">
-      <div className={`playlist-cover ${isCoverLoaded ? '' : 'is-loading'}`}>{coverContent}</div>
+      <Link
+        to={coverLink}
+        className={`playlist-cover block focus:outline-none focus:ring-2 focus:ring-terminal-green ${isCoverLoaded ? '' : 'is-loading'}`}
+        aria-label={`Open ${track.title}`}
+      >
+        {coverContent}
+      </Link>
       <div className="mt-2">
-        <p className="m-0 truncate text-sm text-terminal-text">{track.title}</p>
-        <p className="m-0 truncate text-xs text-terminal-muted">{artistLabel}</p>
+        <Link
+          to={songLink}
+          className="block truncate text-sm text-terminal-text focus:outline-none focus:ring-2 focus:ring-terminal-green"
+          aria-label={`Open song ${track.title}`}
+        >
+          {track.title}
+        </Link>
+        {artistLink ? (
+          <Link
+            to={artistLink}
+            className="block truncate text-xs text-terminal-muted focus:outline-none focus:ring-2 focus:ring-terminal-green"
+            aria-label={`Open artist ${artistLabel}`}
+          >
+            {artistLabel}
+          </Link>
+        ) : (
+          <p className="m-0 truncate text-xs text-terminal-muted">{artistLabel}</p>
+        )}
         <p className="m-0 mt-1 text-[11px] text-terminal-muted">{formatDuration(track.duration ?? 0)}</p>
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1">

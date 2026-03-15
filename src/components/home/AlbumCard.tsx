@@ -1,5 +1,5 @@
 import { type MouseEvent, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ListPlus, Play, SquareArrowOutUpRight } from 'lucide-react'
 
 import type { Album } from '@/api/types'
@@ -27,20 +27,37 @@ export const AlbumCard = ({ album, coverUrl, onPlay, onQueue, onOpen }: AlbumCar
   const navigate = useNavigate()
   const coverAlt = useMemo(() => `${album.name} cover art`, [album.name])
   const openAlbumPage = () => navigate(`/album/${album.id}`)
+  const albumLink = `/album/${album.id}`
+  const artistLink = album.artistId ? `/artist/${album.artistId}` : null
 
   return (
     <article className="terminal-card ascii-frame p-2 transition-transform duration-fast hover:-translate-y-0.5">
-      <button
-        type="button"
-        className="playlist-cover focus:outline-none focus:ring-2 focus:ring-terminal-green"
+      <Link
+        to={albumLink}
+        className="playlist-cover block focus:outline-none focus:ring-2 focus:ring-terminal-green"
         aria-label={`Open album ${album.name}`}
-        onClick={openAlbumPage}
       >
         <CoverArtImage src={coverUrl} alt={coverAlt} className="h-full w-full" />
-      </button>
+      </Link>
       <div className="mt-2">
-        <h3 className="m-0 truncate text-sm md:text-base text-terminal-text">{album.name}</h3>
-        <p className="m-0 truncate text-xs md:text-sm text-terminal-muted">{album.artist ?? 'Unknown artist'}</p>
+        <Link
+          to={albumLink}
+          className="block truncate text-sm md:text-base text-terminal-text focus:outline-none focus:ring-2 focus:ring-terminal-green"
+          aria-label={`Open album details for ${album.name}`}
+        >
+          {album.name}
+        </Link>
+        {artistLink ? (
+          <Link
+            to={artistLink}
+            className="block truncate text-xs md:text-sm text-terminal-muted focus:outline-none focus:ring-2 focus:ring-terminal-green"
+            aria-label={`Open artist ${album.artist ?? 'Unknown artist'}`}
+          >
+            {album.artist ?? 'Unknown artist'}
+          </Link>
+        ) : (
+          <p className="m-0 truncate text-xs md:text-sm text-terminal-muted">{album.artist ?? 'Unknown artist'}</p>
+        )}
       </div>
       <div className="mt-2 flex items-center gap-1">
         <button
@@ -71,4 +88,3 @@ export const AlbumCard = ({ album, coverUrl, onPlay, onQueue, onOpen }: AlbumCar
     </article>
   )
 }
-

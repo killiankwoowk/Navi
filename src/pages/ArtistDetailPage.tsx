@@ -43,15 +43,23 @@ export const ArtistDetailPage = () => {
             {(artistQuery.data.song ?? []).slice(0, 40).map((song, index) => (
               <div key={song.id} className="grid grid-cols-[24px_1fr_auto] items-center gap-2 border border-terminal-text/20 px-2 py-1">
                 <span className="text-[11px] text-terminal-muted">{index + 1}</span>
-                <button
-                  className="truncate text-left text-sm"
-                  type="button"
-                  onClick={() => setQueue(artistQuery.data.song ?? [], index, true)}
+                <Link
+                  to={`/song/${song.id}`}
+                  className="truncate text-left text-sm focus:outline-none focus:ring-2 focus:ring-terminal-green"
+                  aria-label={`Open song ${song.title}`}
                 >
                   {song.title}
-                </button>
+                </Link>
                 <div className="flex items-center gap-1 text-[11px] text-terminal-muted">
                   <span>{formatDuration(song.duration ?? 0)}</span>
+                  <button
+                    className="terminal-button px-1 py-0"
+                    type="button"
+                    onClick={() => setQueue(artistQuery.data.song ?? [], index, true)}
+                    aria-label={`Play ${song.title}`}
+                  >
+                    play
+                  </button>
                   <button className="terminal-button px-1 py-0" type="button" onClick={() => addToQueue([song])}>
                     +q
                   </button>

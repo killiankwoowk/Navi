@@ -16,7 +16,7 @@ Spotify-style Navidrome web frontend with a terminal/CLI visual theme.
 ## Features
 
 - Login to Navidrome using Subsonic token auth (`u`, `t`, `s`)
-- Library browsing: artists, artist detail, album detail, album dashboard
+- Library browsing: artists, artist detail, album detail, song detail, album dashboard
 - Real-time search (artists/albums/songs)
 - Persistent global player (play/pause, seek, prev/next, shuffle, repeat, volume)
 - Queue add/remove/reorder (drag-drop + buttons)
@@ -30,6 +30,7 @@ Spotify-style Navidrome web frontend with a terminal/CLI visual theme.
 - Audio quality control (`auto`, `low`, `medium`, `high`) via `maxBitRate`
 - Cover art via `getCoverArt.view`
 - Stream playback via `/rest/stream.view`
+- Linkable lists: albums, artists, and songs link to their detail pages
 
 ## Run
 
@@ -43,8 +44,8 @@ You can override it with:
 
 ```bash
 # .env.local
-VITE_DEFAULT_NAVIDROME_URL=https://your-navidrome-host
-VITE_GENIUS_API_KEY=    
+VITE_DEFAULT_NAVIDROME_URL=https://music.dobymick.me
+VITE_GENIUS_API_KEY=
 VITE_DEFAULT_AUDIO_QUALITY=auto
 ```
 
@@ -54,6 +55,11 @@ Settings page also supports a local Genius key override (`Settings -> Lyrics`), 
 
 Last.fm authentication is handled by your Navidrome server. Configure it in the Navidrome admin UI.  
 This client only reports playback via `scrobble.view` and shows a session scrobble counter in the player.
+
+## Documentation
+
+Technical architecture, data flow, and integration notes live here:
+[TECHNICAL.md](/d:/Navi/docs/TECHNICAL.md)
 
 ## Quality checks
 

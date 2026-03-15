@@ -6,6 +6,7 @@ export const libraryQueryKeys = {
   artists: ['artists'] as const,
   artist: (id: string) => ['artist', id] as const,
   album: (id: string) => ['album', id] as const,
+  song: (id: string) => ['song', id] as const,
   albums: (type: string, size: number, offset: number) => ['albums', type, size, offset] as const,
 }
 
@@ -39,6 +40,19 @@ export const useAlbumQuery = (id: string) =>
       const client = getNavidromeClientOrNull()
       if (!client) throw new Error('Not authenticated')
       return client.getAlbum(id)
+    },
+    enabled: Boolean(id),
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
+  })
+
+export const useSongQuery = (id: string) =>
+  useQuery({
+    queryKey: libraryQueryKeys.song(id),
+    queryFn: async () => {
+      const client = getNavidromeClientOrNull()
+      if (!client) throw new Error('Not authenticated')
+      return client.getSong(id)
     },
     enabled: Boolean(id),
     staleTime: 5 * 60_000,

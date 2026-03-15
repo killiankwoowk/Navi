@@ -11,6 +11,7 @@ const AlbumsPage = lazy(() => import('@/pages/AlbumsPage').then((module) => ({ d
 const ArtistsPage = lazy(() => import('@/pages/ArtistsPage').then((module) => ({ default: module.ArtistsPage })))
 const ArtistDetailPage = lazy(() => import('@/pages/ArtistDetailPage').then((module) => ({ default: module.ArtistDetailPage })))
 const AlbumDetailPage = lazy(() => import('@/pages/AlbumDetailPage').then((module) => ({ default: module.AlbumDetailPage })))
+const SongDetailPage = lazy(() => import('@/pages/SongDetailPage').then((module) => ({ default: module.SongDetailPage })))
 const SearchPage = lazy(() => import('@/pages/SearchPage').then((module) => ({ default: module.SearchPage })))
 const PlaylistsPage = lazy(() => import('@/pages/PlaylistsPage').then((module) => ({ default: module.PlaylistsPage })))
 const FavoritesPage = lazy(() => import('@/pages/Favorites').then((module) => ({ default: module.Favorites })))
@@ -98,6 +99,10 @@ export const router = createBrowserRouter([
       {
         path: '/album/:id',
         element: <AlbumDetailPage />,
+      },
+      {
+        path: '/song/:id',
+        element: <SongDetailPage />,
       },
       {
         path: '/search',
